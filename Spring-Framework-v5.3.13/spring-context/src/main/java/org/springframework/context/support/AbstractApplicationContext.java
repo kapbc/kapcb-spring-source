@@ -652,6 +652,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// 3.设置容器活跃状态为 true
 		this.active.set(true);
 
+		// 记录日志
 		if (logger.isDebugEnabled()) {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Refreshing " + this);
@@ -662,28 +663,30 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Initialize any placeholder property sources in the context environment.
+		// 留给子类覆盖, 初始化属性资源
 		initPropertySources();
 
 		// Validate that all properties marked as required are resolvable:
 		// see ConfigurablePropertyResolver#setRequiredProperties
+		// 创建并获取 Environment 对象, 验证系统需要的属性文件是否都已加载入 Environment 中
 		getEnvironment().validateRequiredProperties();
 
 		// Store pre-refresh ApplicationListeners...
 		// 5.准备监听器和事件的集合对象, 默认为空集合
-		// 如果 earlyApplicationListeners 为空
+		// 判断刷新前的应用程序监听器集合是否为空, 如果为空则将监听器集合添加到此集合中
 		if (this.earlyApplicationListeners == null) {
-			// 初始化 earlyApplicationListeners 为空 LinkedHashSet
 			this.earlyApplicationListeners = new LinkedHashSet<>(this.applicationListeners);
 		}
-		// 如果 earlyApplicationListeners 不为空, 则将 applicationListeners 清空并将 earlyApplicationListeners 添加到其中
 		else {
 			// Reset local application listeners to pre-refresh state.
+			// 如果不为空, 则清空监听器集合元素
 			this.applicationListeners.clear();
 			this.applicationListeners.addAll(this.earlyApplicationListeners);
 		}
 
 		// Allow for the collection of early ApplicationEvents,
 		// to be published once the multicaster is available...
+		// 创建刷新前的事件监听集合
 		this.earlyApplicationEvents = new LinkedHashSet<>();
 	}
 
@@ -703,7 +706,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see #getBeanFactory()
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
+		// 初始化 beanFactory, 并进行配置读取(XML 或配置类), 并将获取的 beanFactory 记录在当前实体的属性中
 		refreshBeanFactory();
+		// 返回当前实体的 beanFactory 属性
 		return getBeanFactory();
 	}
 
