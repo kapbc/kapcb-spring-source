@@ -553,10 +553,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 			// Prepare this context for refreshing.
 			// 准备刷新上下文环境。作用就是初始化一些状态和属性, 后后续的工作做准备
+			// 1.设置容器启动的时间
+			// 2.设置容器活跃状态为 true
+			// 3.设置容器关闭状态为 false
+			// 4.获取 Environment 对象, 并加载当前系统的属性值到 Environment 对象中
+			// 5.准备监听器和事件的集合对象, 默认为空集合
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
 			// 初始化 beanFactory。如读取XML配置文件操作就是在这一步完成的。
+			// 加载 xml 配置文件或者配置类的属性到当前 beanFactory 中。最重要的就是 BeanDefinition
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
