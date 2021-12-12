@@ -13,5 +13,6 @@ package com.kapcb.ccc;
 public class MainApplication {
 
 	public static void main(String[] args) {
+
 	}
 }
