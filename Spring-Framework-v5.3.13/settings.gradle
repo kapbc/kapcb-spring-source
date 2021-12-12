@@ -1,6 +1,6 @@
 pluginManagement {
 	repositories {
-		// 配置阿里云maven中央仓库
+		// 配置阿里云 maven 中央仓库
 		maven { url "https://maven.aliyun.com/repository/public" }
 		gradlePluginPortal()
 		maven { url "https://repo.spring.io/plugins-release" }
@@ -13,11 +13,11 @@ plugins {
 }
 
 include "spring-aop"
-//移除aspects
-//include "spring-aspects"
+// 移除aspects
+// include "spring-aspects"
 include "spring-beans"
 include "spring-context"
-// idea自动添加自建模块
+// idea 自动添加自建模块
 include 'spring-context-debug'
 include "spring-context-indexer"
 include "spring-context-support"
