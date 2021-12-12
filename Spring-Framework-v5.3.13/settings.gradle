@@ -17,6 +17,8 @@ include "spring-aop"
 //include "spring-aspects"
 include "spring-beans"
 include "spring-context"
+// idea自动添加自建模块
+include 'spring-context-debug'
 include "spring-context-indexer"
 include "spring-context-support"
 include "spring-core"
@@ -57,5 +59,4 @@ settings.gradle.projectsLoaded {
 		}
 	}
 }
-include 'spring-context-debug'
 

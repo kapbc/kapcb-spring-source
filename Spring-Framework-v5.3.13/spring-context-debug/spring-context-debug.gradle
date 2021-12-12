@@ -6,18 +6,25 @@ group 'org.springframework'
 version '5.3.13'
 
 repositories {
+    // 配置本地 maven 仓库
     mavenLocal()
+    // 配置阿里云 maven 仓库
     maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
     maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
+    // 配置 maven 中央仓库
     mavenCentral()
 }
 
 dependencies {
-    implementation(project(':spring-context'))
-//    compile已经被gradle 7.x 弃用, 爷也是醉了
-//    compile(project(":spring-context"))
+    // 测试需要依赖
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    // 导入 spring-context模块, 包含bean工厂
+    implementation(project(':spring-context'))
+    // 导入 spring-instrument 模块, 此模块为 spring-context 模块编译所必须的
+    implementation(project('::spring-instrument'))
+//    compile已经被gradle 7.x 弃用, 爷也是醉了
+//    compile(project(":spring-context"))
 }
 
 test {
