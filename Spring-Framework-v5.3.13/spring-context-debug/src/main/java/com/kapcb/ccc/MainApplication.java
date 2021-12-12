@@ -16,8 +16,11 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class MainApplication {
 
 	public static void main(String[] args) {
+		// 指定配置文件获取Spring Application Context容器
 		ClassPathXmlApplicationContext ioc = new ClassPathXmlApplicationContext("spring-context-debug.xml");
+		// 从ioc容器中获取注册的Bean实例对象
 		TestBean testBean = ioc.getBean("testBean", TestBean.class);
+		// 调用方法
 		testBean.say();
 	}
 

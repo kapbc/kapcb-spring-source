@@ -26,4 +26,5 @@ public class TestBean {
 		System.out.println("调用TestBean中的setUsername方法注入属性");
 		this.username = username;
 	}
+
 }
