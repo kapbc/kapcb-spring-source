@@ -561,39 +561,44 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
-			// 初始化 beanFactory。如读取XML配置文件操作就是在这一步完成的。
+			// 创建容器对象 : DefaultListableBeanFactory
 			// 加载 xml 配置文件或者配置类的属性到当前 beanFactory 中。最重要的就是 BeanDefinition
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
-			// 对上一步中初始化获取的 beanFactory 进行各种功能的填充
+			// beanFactory的准备工作。对各种属性进行填充
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
-				// 对 beanFactory 做增强处理, 默认没有实现
+				// 子类覆盖方法做额外处理, 此处我们自己一般不做任何扩展工作。默认没有实现。但是可以查看 web 中的代码, 是有具体实现的。
 				postProcessBeanFactory(beanFactory);
 
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
 
 				// Invoke factory processors registered as beans in the context.
-				// 激活各种 beanFactory 后置处理
+				// 调用各种 beanFactory 处理器
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
+				// 注册 Bean 处理器。这里只是单纯的注册功能, 真正调用的是 getBean 方法
 				registerBeanPostProcessors(beanFactory);
 				beanPostProcess.end();
 
 				// Initialize message source for this context.
+				// 为上下文初始化 message 源, 即不同语言的消息体, 做国际化处理。
 				initMessageSource();
 
 				// Initialize event multicaster for this context.
+				// 初始化事件监听多路广播器
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
+				// 预留给子类, 用于初始化其他的 Bean
 				onRefresh();
 
 				// Check for listener beans and register them.
+				// 在所有注册的 Bean 中查找 listener beans 并注册到消息消息广播中
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
@@ -610,12 +615,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				}
 
 				// Destroy already created singletons to avoid dangling resources.
+				// 防止 已经创建的 Bean 占用资源, 在异常处理中, 销毁在异常之前创建的单例 Bean
 				destroyBeans();
 
 				// Reset 'active' flag.
+				// 重置容器 active 标志为 false 状态
 				cancelRefresh(ex);
 
 				// Propagate exception to caller.
+				// 抛出异常
 				throw ex;
 			}
 
@@ -976,6 +984,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @param ex the exception that led to the cancellation
 	 */
 	protected void cancelRefresh(BeansException ex) {
+		// 设置容器活跃状态为 false
 		this.active.set(false);
 	}
 
