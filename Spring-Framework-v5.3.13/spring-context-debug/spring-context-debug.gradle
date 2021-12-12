@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+}
+
+group 'org.springframework'
+version '5.3.13'
+
+repositories {
+    mavenLocal()
+    maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
+    maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
+    mavenCentral()
+}
+
+dependencies {
+    implementation(project(':spring-context'))
+//    compile已经被gradle 7.x 弃用, 爷也是醉了
+//    compile(project(":spring-context"))
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}
