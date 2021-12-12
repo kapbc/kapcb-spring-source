@@ -634,8 +634,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void prepareRefresh() {
 		// Switch to active.
+
+		// 1.设置容器的启动时间
 		this.startupDate = System.currentTimeMillis();
+
+		// 2.设置容器关闭状态为 false
 		this.closed.set(false);
+
+		// 3.设置容器活跃状态为 true
 		this.active.set(true);
 
 		if (logger.isDebugEnabled()) {
@@ -655,9 +661,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		getEnvironment().validateRequiredProperties();
 
 		// Store pre-refresh ApplicationListeners...
+		// 5.准备监听器和事件的集合对象, 默认为空集合
+		// 如果 earlyApplicationListeners 为空
 		if (this.earlyApplicationListeners == null) {
+			// 初始化 earlyApplicationListeners 为空 LinkedHashSet
 			this.earlyApplicationListeners = new LinkedHashSet<>(this.applicationListeners);
 		}
+		// 如果 earlyApplicationListeners 不为空, 则将 applicationListeners 清空并将 earlyApplicationListeners 添加到其中
 		else {
 			// Reset local application listeners to pre-refresh state.
 			this.applicationListeners.clear();
