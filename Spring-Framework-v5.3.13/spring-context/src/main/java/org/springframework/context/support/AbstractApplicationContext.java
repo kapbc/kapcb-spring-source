@@ -709,6 +709,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
 		// 初始化 beanFactory, 并进行配置读取(XML 或配置类), 并将获取的 beanFactory 记录在当前实体的属性中
+		// 实际上是将 beanFactory 的创建委托给 refreshBeanFactory() 方法
+		// refreshBeanFactory() 方法被两个类实现 AbstractRefreshableApplicationContext 和 GenericApplicationContext
 		refreshBeanFactory();
 		// 返回当前实体的 beanFactory 属性
 		return getBeanFactory();
