@@ -55,7 +55,7 @@ final class PostProcessorRegistrationDelegate {
 	private PostProcessorRegistrationDelegate() {
 	}
 
-
+	// 对于 BeanDefinitionRegistry 类型的 BeanFactory 的处理
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
@@ -75,9 +75,20 @@ final class PostProcessorRegistrationDelegate {
 		// Invoke BeanDefinitionRegistryPostProcessors first, if any.
 		Set<String> processedBeans = new HashSet<>();
 
+		// 对于 BeanDefinitionRegistry 类型的处理, 这里是交由 BeanDefinitionRegistryPostProcessor 来处理
+		// 判断 BeanFactory 的类型, 如果是 BeanDefinitionRegistry 的子类,
+		// 则交由 BeanDefinitionRegistryPostProcessor 处理, 否则直接按照 BeanFactoryPostProcessor 进行处理
+		// 由于 BeanDefinitionRegistryPostProcessor 只能处理 BeanDefinitionRegistry 的子类, 所以这里必须先进行 beanFactory 的区分
 		if (beanFactory instanceof BeanDefinitionRegistry) {
+			// 以下逻辑看似复杂其实大体就是两部
+			// 1.获取所有硬编码的 BeanDefinitionRegistryPostProcessor 类型, 激活 postProcessBeanDefinitionRegistry 方法
+			// 2.获取所有配置的 BeanDefinitionRegistryPostProcessor 类型, 激活 postProcessBeanDefinitionRegistry 方法
+
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
+
+			// 记录通过硬编码方式注册的 BeanFactoryPostProcessor 类型处理器
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
+			// 记录通过硬编码方式注册的 BeanDefinitionRegistryPostProcessor 类型处理器
 			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
 
 			for (BeanFactoryPostProcessor postProcessor : beanFactoryPostProcessors) {
