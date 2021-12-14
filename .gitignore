@@ -74,7 +74,6 @@ fabric.properties
 /.idea/.gitignore
 *.idea
 target/
-*.jar
 *.class
 
 HELP.md
@@ -103,7 +102,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-log
-*/log
-**/log
