@@ -572,6 +572,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
 				// 子类覆盖方法做额外处理, 此处我们自己一般不做任何扩展工作。默认没有实现。但是可以查看 web 中的代码, 是有具体实现的。
+				// 这个方法是模板方法设计模式的体验, 默认无任何实现, 预留给子类扩展使用
 				postProcessBeanFactory(beanFactory);
 
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
@@ -802,6 +803,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @param beanFactory the bean factory used by the application context
 	 */
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+		// 无实现, 预留给子类扩展使用
+		// 模板方法设计模式体现
 	}
 
 	/**
