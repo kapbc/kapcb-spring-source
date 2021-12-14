@@ -73,12 +73,12 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 /.idea/.gitignore
 *.idea
-target/
+
 *.class
 
 HELP.md
 !.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
+
 !**/src/test/**/target/
 
 ### STS ###
