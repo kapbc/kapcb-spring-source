@@ -7,6 +7,7 @@ pluginManagement {
 	}
 }
 
+// gradle 插件, 不可注释, 否则后面会报错
 plugins {
 	id "com.gradle.enterprise" version "3.6.1"
 	id "io.spring.ge.conventions" version "0.0.7"
