@@ -1,4 +1,4 @@
-package com.kapcb.ccc.components;
+package com.kapcb.ccc.model;
 
 /**
  * <a>Title: Bean </a>
@@ -10,5 +10,11 @@ package com.kapcb.ccc.components;
  * @date 2021/12/11 23:21
  * @since 1.0
  */
-public interface Bean {
+public interface DebugBean {
+
+	/**
+	 * say method
+	 */
+	void say();
+
 }
