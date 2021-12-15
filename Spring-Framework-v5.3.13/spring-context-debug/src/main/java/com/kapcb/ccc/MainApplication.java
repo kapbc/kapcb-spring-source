@@ -28,7 +28,7 @@ public class MainApplication {
 	 * 5.初始化
 	 * 6.获取到完整的对象
 	 *
-	 * @param args
+	 * @param args String[]
 	 */
 	public static void main(String[] args) {
 		// 指定配置文件获取Spring Application Context容器
