@@ -817,6 +817,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime
 		// (e.g. through an @Bean method registered by ConfigurationClassPostProcessor)
+		// Aspect J 提供了两种织入方式,
+		// 第一种是通过编译器织入, 将使用 Aspect J 语言编写的切面类织入到 Java 类中
+		// 第二种是通过类加载器织入, 就是下面的 loadTimeWeaver (LOAD_TIME_WEAVER_BEAN_NAME)
 		if (!NativeDetector.inNativeImage() && beanFactory.getTempClassLoader() == null && beanFactory.containsBean(LOAD_TIME_WEAVER_BEAN_NAME)) {
 			beanFactory.addBeanPostProcessor(new LoadTimeWeaverAwareProcessor(beanFactory));
 			beanFactory.setTempClassLoader(new ContextTypeMatchClassLoader(beanFactory.getBeanClassLoader()));
