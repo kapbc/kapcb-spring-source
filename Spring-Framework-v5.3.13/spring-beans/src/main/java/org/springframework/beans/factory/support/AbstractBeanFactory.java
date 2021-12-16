@@ -205,6 +205,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 	@Override
 	public Object getBean(String name) throws BeansException {
+		// 实际获取 Bean 的方法, 也是触发依赖注入的方法
 		return doGetBean(name, null, null, false);
 	}
 
@@ -226,6 +227,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * (only applied when creating a new instance as opposed to retrieving an existing one)
 	 * @return an instance of the bean
 	 * @throws BeansException if the bean could not be created
+	 *
+	 * 返回一个实例, 该实例可以指定 Bean 的共享或独立
 	 */
 	public <T> T getBean(String name, @Nullable Class<T> requiredType, @Nullable Object... args)
 			throws BeansException {
@@ -249,11 +252,16 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			String name, @Nullable Class<T> requiredType, @Nullable Object[] args, boolean typeCheckOnly)
 			throws BeansException {
 
+		// 提起对应的 beanName, 这里提取之后不可直接使用, 还需要进行转换, 原因在于当 Bean 对象实现 FactoryBean 接口
+		// 之后就会变成 &beanName。并且如果同时存在别名, 也需要
 		String beanName = transformedBeanName(name);
 		Object beanInstance;
 
 		// Eagerly check singleton cache for manually registered singletons.
+		// 提前检查单例缓存中是否有手动注册的单实例 Bean 对象, 与处理循环依赖有关联
 		Object sharedInstance = getSingleton(beanName);
+
+		// 如果 Bean 的单例对象找到了, 并且没有创建实例时需要使用的参数
 		if (sharedInstance != null && args == null) {
 			if (logger.isTraceEnabled()) {
 				if (isSingletonCurrentlyInCreation(beanName)) {
@@ -264,6 +272,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					logger.trace("Returning cached instance of singleton bean '" + beanName + "'");
 				}
 			}
+			// 返回对象的实例。当实现了 FactoryBean 接口的对象, 需要获取具体的对象时就需要调用此方法来获取实例对象
 			beanInstance = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		}
 

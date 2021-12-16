@@ -28,12 +28,12 @@ public class MainApplication {
 	 * 5.初始化
 	 * 6.获取到完整的对象
 	 *
-	 * @param args
+	 * @param args String[]
 	 */
 	public static void main(String[] args) {
-		// 指定配置文件获取Spring Application Context容器
+		// 指定配置文件获取 Spring Application Context 容器
 		BeanFactory beanFactory = new ClassPathXmlApplicationContext("spring-context-debug.xml");
-		// 从ioc容器中获取注册的Bean实例对象
+		// 从 IOC 容器中获取注册的 Bean 实例对象
 		TestBean testBean = beanFactory.getBean("testBean", TestBean.class);
 		// 调用方法
 		testBean.say();
