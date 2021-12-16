@@ -259,6 +259,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		// Eagerly check singleton cache for manually registered singletons.
 		// 提前检查单例缓存中是否有手动注册的单实例 Bean 对象, 与处理循环依赖有关联
+		// 我们自定义 Bean 一般在这一步获取到的都是 null
 		Object sharedInstance = getSingleton(beanName);
 
 		// 如果 Bean 的单例对象找到了, 并且没有创建实例时需要使用的参数
@@ -279,32 +280,46 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		else {
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
+			// 当对象都是单例的时候会尝试解决循环依赖的问题, 但是如果是原型模式存在循环依赖的情况, 那么直接抛出异常
 			if (isPrototypeCurrentlyInCreation(beanName)) {
 				throw new BeanCurrentlyInCreationException(beanName);
 			}
 
 			// Check if bean definition exists in this factory.
+			// 如果 Bean 定义不存在, 那就检查父父工厂是否存在
 			BeanFactory parentBeanFactory = getParentBeanFactory();
+
+			// 如果 BeanDefinitionMap 中也就是所有已经加载的类中不包含 beanName, 那么就尝试从父容器中获取
 			if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
 				// Not found -> check parent.
+				// 获取 name 对应的规范名称[全类名], 如果 name 前有 &, 则返回 '&'+规范名称[全类名]
 				String nameToLookup = originalBeanName(name);
+
+				// 如果父工厂是 AbstractBeanFactory 的实例
 				if (parentBeanFactory instanceof AbstractBeanFactory) {
+					// 调用父工厂的 doGetBean 方法。就是该方法。[递归]
 					return ((AbstractBeanFactory) parentBeanFactory).doGetBean(
 							nameToLookup, requiredType, args, typeCheckOnly);
 				}
 				else if (args != null) {
 					// Delegation to parent with explicit args.
+					// 如果有要创建 Bean 实例时需要的参数
+					// 使用显示参数委派给父工厂。父工厂通过 Bean 全类名和创建 Bean 需要的参数获取该 Bean 对象的实例
 					return (T) parentBeanFactory.getBean(nameToLookup, args);
 				}
 				else if (requiredType != null) {
 					// No args -> delegate to standard getBean method.
+					// 如果没有创建 Bean 时需要使用的参数 -> 委托给标准的 getBean 方法
+					// 使用父工厂获取该 Bean 对象, 通过 Bean 的全类名和所需的 Bean 类型
 					return parentBeanFactory.getBean(nameToLookup, requiredType);
 				}
 				else {
+					// 使用父工厂通过 Bean 的全类名获取 Bean 实例对象
 					return (T) parentBeanFactory.getBean(nameToLookup);
 				}
 			}
 
+			// 如果不是做类型检查, 那么表示要创建 Bean 实例, 此处在集合中做一个记录
 			if (!typeCheckOnly) {
 				markBeanAsCreated(beanName);
 			}
