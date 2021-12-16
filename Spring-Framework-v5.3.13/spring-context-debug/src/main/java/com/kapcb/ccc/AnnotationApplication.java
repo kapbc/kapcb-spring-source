@@ -20,4 +20,5 @@ public class AnnotationApplication {
 		DebugBean testBean = beanFactory.getBean("testBean", DebugBean.class);
 		testBean.say();
 	}
+
 }
