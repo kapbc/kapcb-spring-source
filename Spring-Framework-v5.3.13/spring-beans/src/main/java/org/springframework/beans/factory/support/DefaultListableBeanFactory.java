@@ -923,11 +923,18 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		// Trigger initialization of all non-lazy singleton beans...
 		// 触发所有非延迟加载单例 Bean 的初始化, 遍历 BeanDefinition 集合对象
 		for (String beanName : beanNames) {
+
+			// Bean 定义信息的公共抽象类是 AbstractBeanDefinition, 普通的 Bean 在 Spring 解析 Bean 定义信息时实例化出来的是 GenericBeanDefinition
+			// Spring 上下文包括实例化所有 Bean 使用的 AbstractBeanDefinition 是 RootBeanDefinition
+			// 使用 getMergedLocalBeanDefinition 方法做了一次转化, 将非 RootBeanDefinition 转换为 RootBeanDefinition 以供后续操作
+			// 注意, 如果当前 BeanDefinition 存在父 BeanDefinition, 会基于父 BeanDefinition 生成一个 RootBeanDefinition, 然后在将调用 OverrideFrom 子 BeanDefinition 的相关属性覆写进去
 			// 合并父类 BeanDefinition
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
-			// 条件判断。非抽象类 && 单例 && 非懒加载
+
+			// 条件判断。非抽象类 && 单例 && 非懒加载, 则开始创建单例对象, 通过调用 getBean(beanName) 方法进行初始化
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
-				// 判断是否实现 BeanFactory 接口
+				// 判断是否实现 BeanFactory 接口, 如果实现了 BeanFactory 接口, 判断是否立即初始化
+				// 判断 Bean 是否立即初始化, 根据 Bean 是否实现了 SmartFactoryBean 接口并重写内部方法 isEagerInit 并返回 true
 				if (isFactoryBean(beanName)) {
 					// 根据 & + beanName 来获取 IOC 容器中的 Bean 对象
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
