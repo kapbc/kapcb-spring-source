@@ -321,6 +321,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 			// 如果不是做类型检查, 那么表示要创建 Bean 实例, 此处在集合中做一个记录
 			if (!typeCheckOnly) {
+				// 将 beanName 标记为已创建(或将要创建)
 				markBeanAsCreated(beanName);
 			}
 
@@ -330,21 +331,33 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				if (requiredType != null) {
 					beanCreation.tag("beanType", requiredType::toString);
 				}
+
+				// 此处做了 BeanDefinition 对象的转换。当从 XML 文件中加载 BeanDefinition 对象时, 封装的对象是 GenericBeanDefinition
+				// 此处要做类型转换, 如果是子类 Bean 的话, 会合并父类的相关属性
 				RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
+
+				// 检验 MergedBeanDefinition 的合法性, 不合法将会引发验证异常
 				checkMergedBeanDefinition(mbd, beanName, args);
 
 				// Guarantee initialization of beans that the current bean depends on.
+				// 如果存在依赖的 Bean 实例话, 优先实力化依赖的 Bean
 				String[] dependsOn = mbd.getDependsOn();
 				if (dependsOn != null) {
+					// 如果存在依赖的 Bean, 则需要递归实例化依赖的 Bean
 					for (String dep : dependsOn) {
+						// 如果 beanName 已经注册依赖于 dependentBeanName 的关系则抛出异常
 						if (isDependent(beanName, dep)) {
 							throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 									"Circular depends-on relationship between '" + beanName + "' and '" + dep + "'");
 						}
+
+						// 注册各个 Bean 的依赖关系, 方便进行销毁
 						registerDependentBean(dep, beanName);
 						try {
+							// 递归优先实例化被依赖的 Bean
 							getBean(dep);
 						}
+						// 捕捉未找到 BeanDefinition 异常, 'beanName' 依赖于缺少的 bean 'dep'
 						catch (NoSuchBeanDefinitionException ex) {
 							throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 									"'" + beanName + "' depends on missing bean '" + dep + "'", ex);
@@ -353,15 +366,21 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 
 				// Create bean instance.
+				// 创建 Bean 的实例对象
 				if (mbd.isSingleton()) {
+
+					// 返回以 beanName 的(原始)单例对象, 如果未注册, 则使用 SingletonFactory 创建并注册一个对象
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
+							// 为给定的合并后的 BeanDefinition 和创建该 Bean 所需的参数来创建一个 Bean 实例对象
 							return createBean(beanName, mbd, args);
 						}
 						catch (BeansException ex) {
 							// Explicitly remove instance from singleton cache: It might have been put there
 							// eagerly by the creation process, to allow for circular reference resolution.
 							// Also remove any beans that received a temporary reference to the bean.
+							// 显示地从单例缓存中删除实例 : 它可能是由创建过程急切地放在那里, 以允许循环依赖解。
+							// 还要移除接收到该 Bean 临时引用的任何 Bean
 							destroySingleton(beanName);
 							throw ex;
 						}
@@ -1498,6 +1517,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected void checkMergedBeanDefinition(RootBeanDefinition mbd, String beanName, @Nullable Object[] args)
 			throws BeanDefinitionStoreException {
 
+		// 如果是抽象类 抛出异常
 		if (mbd.isAbstract()) {
 			throw new BeanIsAbstractException(beanName);
 		}

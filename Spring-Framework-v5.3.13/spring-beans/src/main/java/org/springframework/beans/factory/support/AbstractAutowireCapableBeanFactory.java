@@ -511,13 +511,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Make sure bean class is actually resolved at this point, and
 		// clone the bean definition in case of a dynamically resolved Class
 		// which cannot be stored in the shared merged bean definition.
+		// 锁定 class。根据设置的 class 属性或者根据 className 来解析 class
 		Class<?> resolvedClass = resolveBeanClass(mbd, beanName);
+		// 进行条件筛选, 重新赋值 RootBeanDefinition, 并设置 BeanClass 属性
 		if (resolvedClass != null && !mbd.hasBeanClass() && mbd.getBeanClassName() != null) {
+			// 重新创建一个 RootBeanDefinition 对象
 			mbdToUse = new RootBeanDefinition(mbd);
+			// 设置 BeanClass 属性
 			mbdToUse.setBeanClass(resolvedClass);
 		}
 
 		// Prepare method overrides.
+		// 验证及准备覆盖的方法 : lookup-method, replace-method。当需要创建的 Bean 对象中包含了
+		// lookup-method 和 replace-method 标签的时候, 会产生覆盖操作
 		try {
 			mbdToUse.prepareMethodOverrides();
 		}
