@@ -208,6 +208,8 @@ public abstract class BeanUtils {
 						argsWithDefaultValues[i] = args[i];
 					}
 				}
+				// 调用构造器的 newInstance() 方法实例化对象
+				// 此时实例化的对象中的属性是没有值的
 				return ctor.newInstance(argsWithDefaultValues);
 			}
 		}
