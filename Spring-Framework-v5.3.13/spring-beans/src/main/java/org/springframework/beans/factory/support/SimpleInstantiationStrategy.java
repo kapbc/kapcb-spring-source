@@ -60,23 +60,35 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 	@Override
 	public Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner) {
 		// Don't override the class with CGLIB if no overrides.
+		// RootBeanDefinition 对象定义中, 是否包含 MethodOverride 列表, Spring 中会有两个标签参数会产生 MethodOverrides, 分别是 lookup-method, replaced-method
+		// 没有 MethodOverrides 对象则直接实例化
 		if (!bd.hasMethodOverrides()) {
+			// 实例化对象的构造方法
 			Constructor<?> constructorToUse;
+			// 锁定对象, 使获得实例化构造方法线程安全
 			synchronized (bd.constructorArgumentLock) {
+				// 查看 RootBeanDefinition 中是否含有实例化对象的构造方法或者工厂方法
 				constructorToUse = (Constructor<?>) bd.resolvedConstructorOrFactoryMethod;
+				// 如果没有
 				if (constructorToUse == null) {
+					// 直接从 RootBeanDefinition 中获取 BeanClass 对象
 					final Class<?> clazz = bd.getBeanClass();
+					// 如果获取的 BeanClass 对象是一个接口类型, 直接抛出异常
 					if (clazz.isInterface()) {
 						throw new BeanInstantiationException(clazz, "Specified class is an interface");
 					}
 					try {
+						// 获取系统安全管理器
 						if (System.getSecurityManager() != null) {
 							constructorToUse = AccessController.doPrivileged(
 									(PrivilegedExceptionAction<Constructor<?>>) clazz::getDeclaredConstructor);
 						}
 						else {
+							// 如果系统安全管理器没有获取到, 则直接获取默认的无参构造方法
 							constructorToUse = clazz.getDeclaredConstructor();
 						}
+						// 获取到构造器之后将构造器赋值给 RootBeanDefinition 中的 resolvedConstructorOrFactoryMethod 进行缓存, 避免
+						// 下次创建相同 Bean 对象实例时重复解析
 						bd.resolvedConstructorOrFactoryMethod = constructorToUse;
 					}
 					catch (Throwable ex) {
@@ -84,6 +96,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 					}
 				}
 			}
+			// 通过反射生成具体的 Bean 实例化对象
 			return BeanUtils.instantiateClass(constructorToUse);
 		}
 		else {
