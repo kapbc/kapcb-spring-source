@@ -97,6 +97,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 				}
 			}
 			// 通过反射生成具体的 Bean 实例化对象
+			// 此时实例化出来的 Bean 对象中的属性都为空, 需要待后续进行属性填充
 			return BeanUtils.instantiateClass(constructorToUse);
 		}
 		else {
