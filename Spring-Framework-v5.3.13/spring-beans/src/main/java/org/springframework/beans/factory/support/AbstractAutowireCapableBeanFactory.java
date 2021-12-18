@@ -1201,56 +1201,84 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected BeanWrapper createBeanInstance(String beanName, RootBeanDefinition mbd, @Nullable Object[] args) {
 		// Make sure bean class is actually resolved at this point.
+		// 确认需要创建 Bean 实例的类可以实例化
 		Class<?> beanClass = resolveBeanClass(mbd, beanName);
 
+		//确保 beanClass 不为空, 且访问权限是 public
 		if (beanClass != null && !Modifier.isPublic(beanClass.getModifiers()) && !mbd.isNonPublicAccessAllowed()) {
 			throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 					"Bean class isn't public, and non-public access not allowed: " + beanClass.getName());
 		}
 
+		// 确保当前 BeanDefinition 中是否包含实例供应器。此处相当一个回调方法, 利用回调方法来创建 Bean 实例对象
 		Supplier<?> instanceSupplier = mbd.getInstanceSupplier();
 		if (instanceSupplier != null) {
 			return obtainFromSupplier(instanceSupplier, beanName);
 		}
 
+		// 如果工厂方法不会空则使用工厂方法初始化策略
 		if (mbd.getFactoryMethodName() != null) {
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}
 
+		// 一个类可能存在多个构造器, 所以 Spring 需要根据创建 Bean 所需的参数个数、类型来确定需要调用的构造器
+		// 在使用构造器创建完成 Bean 实例后, Spring 会将解析过后确定下来的构造器或工厂方法保存在缓存中, 避免再次创建相同 Bean 时重复解析
+
 		// Shortcut when re-creating the same bean...
+		// 进行标记, 防止重复创建同一个 Bean
 		boolean resolved = false;
+		// 是否需要自动装配
 		boolean autowireNecessary = false;
+		// 如果实例化 Bean 不需要参数
 		if (args == null) {
 			synchronized (mbd.constructorArgumentLock) {
+				// 一个列可能会有多个构造函数, 所以需要根据配置文件中的参数、或传入的参数来确定最终调用用于实例化 Bean 的构造器
+				// 因为在判断过程中会进行比较, 所以 Spring 会将解析、确定好的构造函数缓存到 BeanDefinition 中的 resolvedConstructorOrFactoryMethod 字段中
+				// 在下次创建相同 Bean 对象时, 直接从 BeanDefinition 中的属性 resolvedConstructorOrFactoryMethod 缓存的值获取, 避免再次解析
 				if (mbd.resolvedConstructorOrFactoryMethod != null) {
 					resolved = true;
 					autowireNecessary = mbd.constructorArgumentsResolved;
 				}
 			}
 		}
+
+		// 有符合创建 Bean 实例对象所需的构造器或工厂方法
 		if (resolved) {
+			// 构造器有参数
 			if (autowireNecessary) {
 				return autowireConstructor(beanName, mbd, null, null);
 			}
 			else {
+				// 使用默认构造函数构造
 				return instantiateBean(beanName, mbd);
 			}
 		}
 
 		// Candidate constructors for autowiring?
+		// 从 Bean 后置处理器中为自动装配寻找构造方法, 有且仅有一个有参构造器或者有且仅有 @Autowired 注解构造
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
+
+		// 以下情况符合其一即可
+		// 1.存在可选构造方法(获取用于实例化 Bean 的构造器不为空)
+		// 2.自动装配模型为构造函数自动装配
+		// 3.给 BeanDefinition 中设置了构造参数值
+		// 4.有参与构造函数参数列表中的参数
 		if (ctors != null || mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR ||
 				mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args)) {
 			return autowireConstructor(beanName, mbd, ctors, args);
 		}
 
 		// Preferred constructors for default construction?
+		// 找出最合适的默认构造方法
 		ctors = mbd.getPreferredConstructors();
 		if (ctors != null) {
+			// 构造函数自动注入
 			return autowireConstructor(beanName, mbd, ctors, null);
 		}
 
 		// No special handling: simply use no-arg constructor.
+		// 使用默认的无参构造函数创建 Bean 实例对象
+		// 如果没有无参构造且存在多个有参构造函数且没有 @Autowired 注解构造则会抛出异常
 		return instantiateBean(beanName, mbd);
 	}
 
