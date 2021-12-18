@@ -583,15 +583,28 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			throws BeanCreationException {
 
 		// Instantiate the bean.
+		// BeanWrapper 用于持有创建出来的 Bean 实例对象
 		BeanWrapper instanceWrapper = null;
+
+		// 获取 FactoryBean 实例缓存
 		if (mbd.isSingleton()) {
+			// 如果是单实例 Bean 则从 FactoryBean 实例缓存中移除当前 Bean 的定义信息
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
+
+		// 如果 Bean 实例空则创建 Bean
 		if (instanceWrapper == null) {
+			// 根据执行 Bean 使用对应的策略创建新的实例。如 : 工厂方法、构造函数主动注入、简单初始化
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
+
+		// 从包装类中获取原始 Bean
 		Object bean = instanceWrapper.getWrappedInstance();
+
+		// 获取具体的 Bean 对象的 Class 属性
 		Class<?> beanType = instanceWrapper.getWrappedClass();
+
+		// 如果获取的 Bean 对象的 Class 属性不等于 NullBean 类型, 则修改目标类型
 		if (beanType != NullBean.class) {
 			mbd.resolvedTargetType = beanType;
 		}
