@@ -599,6 +599,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// 从包装类中获取原始 Bean
+		// 此时获取的 Bean 只是进行了实例化, Bean 中的属性全部为空
 		Object bean = instanceWrapper.getWrappedInstance();
 
 		// 获取具体的 Bean 对象的 Class 属性
@@ -610,9 +611,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// Allow post-processors to modify the merged bean definition.
+		// 允许 BeanPsotProcessor 去修改合并的 BeanDefinition
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
 				try {
+					// MergedBeanDefinitionPostProcessor 后置处理器修改合并 Bean 的定义
 					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
 				}
 				catch (Throwable ex) {
@@ -625,6 +628,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Eagerly cache singletons to be able to resolve circular references
 		// even when triggered by lifecycle interfaces like BeanFactoryAware.
+		// 判断当前 Bean 是否需要提前曝光 : 单例 && 允许循环依赖 && 当前 Bean 正在创建中。检测循环依赖
 		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
 				isSingletonCurrentlyInCreation(beanName));
 		if (earlySingletonExposure) {
@@ -632,13 +636,21 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
+			// 为避免后期循环依赖, 可以在 Bean 初始化完成前将创建实例的 ObjectFactory 加入工厂
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
+
+			// 只保留二级缓存, 不向三级缓存中存放对象
+			// earlySingletonObjects.put(beanName, bean);
+			// registeredSingletons.add(beanName);
 		}
 
 		// Initialize the bean instance.
+		// 初始化 Bean 实例
 		Object exposedObject = bean;
 		try {
+			// 对 Bean 的属性进行填充, 将各个属性值注入。其中可能存在依赖于其他 Bean 的属性, 则会递归初始化依赖的 Bean
 			populateBean(beanName, mbd, instanceWrapper);
+			// 执行初始化逻辑
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
 		}
 		catch (Throwable ex) {
