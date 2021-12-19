@@ -1887,7 +1887,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					(mbd != null ? mbd.getResourceDescription() : null),
 					beanName, "Invocation of init method failed", ex);
 		}
+
+		// 如果 RootBeanDefinition 不为空 || RootBeanDefinition 不是 synthetic
 		if (mbd == null || !mbd.isSynthetic()) {
+			// 将 BeanPostProcessor 应用到给定的现有 Bean 实例, 调用它们的 postProcessAfterInitialization 方法
+			// 返回的 Bean 实例可能是原始 Bean 包装器
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
 
