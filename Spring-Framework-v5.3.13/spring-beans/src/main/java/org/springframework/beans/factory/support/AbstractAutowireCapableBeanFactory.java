@@ -435,14 +435,24 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName)
 			throws BeansException {
 
+		// 初始化返回结果为 existingBean
 		Object result = existingBean;
+		// 遍历, 该工厂创建的 Bean 的 BeanPostProcessors 列表
 		for (BeanPostProcessor processor : getBeanPostProcessors()) {
+			// postProcessBeforeInitialization : 在任何 Bean 初始化回调之前(如初始化 Bean 的 afterPropertiesSet 或自定义的 init 方法)
+			// 将此 BeanPostProcessor 应用到给定的新 Bean 实例。Bean 已经填充了属性值。返回的 Bean 实例可能是原始 Bean 的包装器
+			// 默认实现按原样返回给定的 Bean
 			Object current = processor.postProcessBeforeInitialization(result, beanName);
+
+			// 如果 current 为空
 			if (current == null) {
+				// 直接返回 result, 中断其后续的 BeanPostProcessor 处理器
 				return result;
 			}
+			// 让 result 引用 processor 返回的结果, 使其经过所有 BeanPostProcessor 对象的后置处理器的层层包装
 			result = current;
 		}
+		// 返回经过所有 BeanPostProcessor 对象的后置处理器的层层包装后的 result
 		return result;
 	}
 
@@ -1863,6 +1873,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		if (mbd == null || !mbd.isSynthetic()) {
 			// 将 BeanPostProcessor 应用到给定的现有 Bean 实例, 调用它们的 PostProcessorsBeforeInitialization 初始化方法
 			// 返回的 Bean 实例可能是原始 Bean 包装器
+			// 执行 applyBeanPostProcessorsBeforeInitialization 方法后会将 ApplicationConext 注入进来
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 
