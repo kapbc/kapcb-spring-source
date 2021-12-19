@@ -114,8 +114,8 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 	}
 
 	/**
-	 *
-	 * @param bean
+	 * 如果某个 Bean 实现了 Aware 接口, 给指定的 Bean 设置相关的属性值。
+	 * @param bean bean
 	 */
 	private void invokeAwareInterfaces(Object bean) {
 		if (bean instanceof EnvironmentAware) {
