@@ -1859,15 +1859,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		Object wrappedBean = bean;
-		// 如果 RootBeanDefinition 不为空 || RootBeanDefinition 不是'synthetic'
+		// 如果 RootBeanDefinition 不为空 || RootBeanDefinition 不是 synthetic。一般指只有 AOP 相关的 PointCut 配置或者 Advice 配置才会将 synthetic 设置为 true
 		if (mbd == null || !mbd.isSynthetic()) {
+			// 将 BeanPostProcessor 应用到给定的现有 Bean 实例, 调用它们的 PostProcessorsBeforeInitialization 初始化方法
+			// 返回的 Bean 实例可能是原始 Bean 包装器
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 
 		try {
+			// 调用初始化方法, 先调用 Bean 的 InitializeBean 接口方法, 后调用 Bean 的自定义初始化方法
 			invokeInitMethods(beanName, wrappedBean, mbd);
 		}
 		catch (Throwable ex) {
+			// 捕捉调用初始化方法时抛出的异常, 重新抛出 Bean 创建异常 : 调用初始化方法失败
 			throw new BeanCreationException(
 					(mbd != null ? mbd.getResourceDescription() : null),
 					beanName, "Invocation of init method failed", ex);
