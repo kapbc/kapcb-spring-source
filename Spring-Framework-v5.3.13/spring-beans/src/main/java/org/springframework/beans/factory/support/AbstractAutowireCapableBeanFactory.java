@@ -1880,21 +1880,38 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
 
+		// 返回包装后的 Bean
 		return wrappedBean;
 	}
 
+	/**
+	 * 回调 Bean 中 Aware 接口中的方法
+	 * @param beanName the bean name in the factory (for debugging purposes)
+	 * @param bean the new bean instance we may need to initialize
+	 */
 	private void invokeAwareMethods(String beanName, Object bean) {
+		// 如果 Bean 是 Aware 实例
 		if (bean instanceof Aware) {
+
+			// 如果 Bean 是 BeanNameAware 实例
 			if (bean instanceof BeanNameAware) {
+				// 调用 Bean 的 setBeanName() 方法
 				((BeanNameAware) bean).setBeanName(beanName);
 			}
+
+			// 如果 Bean 是 BeanClassLoaderAware 实例
 			if (bean instanceof BeanClassLoaderAware) {
+				// 获取此工厂的类加载器以加载 Bean 类(即使无法使用 Classloader, 也只能为 null)
 				ClassLoader bcl = getBeanClassLoader();
 				if (bcl != null) {
+					// 如果获取的类加载器不为空, 则调用 Bean 的 setBeanClassLoader 方法
 					((BeanClassLoaderAware) bean).setBeanClassLoader(bcl);
 				}
 			}
+
+			// 如果 Bean 是 BeanFactoryAware 实例
 			if (bean instanceof BeanFactoryAware) {
+				// 调用 Bean 的 setBeanFactory 方法
 				((BeanFactoryAware) bean).setBeanFactory(AbstractAutowireCapableBeanFactory.this);
 			}
 		}
