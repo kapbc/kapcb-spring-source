@@ -76,6 +76,13 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 	}
 
 
+	/**
+	 * 接口 BeanPostProcessor 规定的方法, 会在 Bean 创建时, 实例化后, 初始化前, 对 Bean 对象应用
+	 * @param bean the new bean instance
+	 * @param beanName the name of the bean
+	 * @return Object
+	 * @throws BeansException BeansException
+	 */
 	@Override
 	@Nullable
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
@@ -94,6 +101,7 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 
 		if (acc != null) {
 			AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+				// 检测 Bean 上是否实现了某个 Aware 接口, 有的话进行相关调用
 				invokeAwareInterfaces(bean);
 				return null;
 			}, acc);
@@ -105,6 +113,10 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 		return bean;
 	}
 
+	/**
+	 * 如果某个 Bean 实现了 Aware 接口, 给指定的 Bean 设置相关的属性值。
+	 * @param bean bean
+	 */
 	private void invokeAwareInterfaces(Object bean) {
 		if (bean instanceof EnvironmentAware) {
 			((EnvironmentAware) bean).setEnvironment(this.applicationContext.getEnvironment());
