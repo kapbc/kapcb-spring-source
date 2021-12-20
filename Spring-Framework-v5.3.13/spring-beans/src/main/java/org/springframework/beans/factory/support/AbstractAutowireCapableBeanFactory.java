@@ -1884,6 +1884,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		try {
 			// 调用初始化方法, 先调用 Bean 的 InitializeBean 接口方法, 后调用 Bean 的自定义初始化方法
+			// invokeInitMethods() 方法的作用是执行初始化方法, 这些初始化方法包括 :
+			// 1.在 XML 文件中的 <bean></bean> 标签中使用的 init-method 属性的 Bean 初始化方法;
+			// 2.在 @Bean 注解中使用 initMethod 属性指定的 Bean 初始化方法;
+			// 3.使用 @PostConstruct 注解标注的方法;
+			// 4.实现 InitializingBean 接口的方法等;
 			invokeInitMethods(beanName, wrappedBean, mbd);
 		}
 		catch (Throwable ex) {
