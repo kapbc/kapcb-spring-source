@@ -75,6 +75,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 */
 	public void setConfigLocations(@Nullable String... locations) {
 		if (locations != null) {
+			// 使用 XML 文件配置的方式配置 Spring IOC 容器。用于设置 XML 文件的解析路径
 			Assert.noNullElements(locations, "Config locations must not be null");
 			this.configLocations = new String[locations.length];
 			for (int i = 0; i < locations.length; i++) {
