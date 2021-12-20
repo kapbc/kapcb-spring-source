@@ -1858,11 +1858,15 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @return {@code true} if actually removed, {@code false} otherwise
 	 */
 	protected boolean removeSingletonIfCreatedForTypeCheckOnly(String beanName) {
+		// 如果当前已创建完成 Bean 所依赖的 Bean 还有没有创建完成的, 则代表有循环依赖
 		if (!this.alreadyCreated.contains(beanName)) {
+			// 移除缓存的单例 beanName
 			removeSingleton(beanName);
+			// 返回 true
 			return true;
 		}
 		else {
+			// 如果当前已创建完成 Bean 所依赖的 Bean 已经创建完成, 则代表无循环依赖
 			return false;
 		}
 	}
