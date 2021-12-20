@@ -1368,16 +1368,21 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected BeanWrapper obtainFromSupplier(Supplier<?> instanceSupplier, String beanName) {
 		Object instance;
 
+		// 获取原先上下文的 outerBean
 		String outerBean = this.currentlyCreatedBean.get();
+		// 替换为当前 beanName
 		this.currentlyCreatedBean.set(beanName);
 		try {
+			// 调用具体的方法进行 Instance 实例创建
 			instance = instanceSupplier.get();
 		}
 		finally {
 			if (outerBean != null) {
+				// 替换为原先的值
 				this.currentlyCreatedBean.set(outerBean);
 			}
 			else {
+				// 为空则移除
 				this.currentlyCreatedBean.remove();
 			}
 		}
@@ -1385,7 +1390,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		if (instance == null) {
 			instance = new NullBean();
 		}
+		// 包装为 BeanWrapper
 		BeanWrapper bw = new BeanWrapperImpl(instance);
+		// 对 BeanWrapper 进行初始化, 并对 PropertyEditorRegistry 进行初始化
 		initBeanWrapper(bw);
 		return bw;
 	}
