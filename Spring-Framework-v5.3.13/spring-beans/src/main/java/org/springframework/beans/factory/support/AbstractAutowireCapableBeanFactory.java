@@ -431,6 +431,20 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return initializeBean(beanName, existingBean, null);
 	}
 
+	/**
+	 * @param existingBean the existing bean instance
+	 * @param beanName the name of the bean, to be passed to it if necessary
+	 * (only passed to {@link BeanPostProcessor BeanPostProcessors};
+	 * can follow the {@link #ORIGINAL_INSTANCE_SUFFIX} convention in order to
+	 * enforce the given instance to be returned, i.e. no proxies etc)
+	 * @return BeansException
+	 * @throws BeansException
+	 *
+	 * 注意 : 在执行此方法之前已经执行了 populateBean 方法为 Bean 中的属性进行了填充。
+	 * 此时 Bean 实例已经通过反射创建完成并且 Bean 中的属性也已经填充完毕, 调用此方法之
+	 * 后将会返回通过该 Bean 的 BeanPostProcessor 层层包装的 Bean, 也有可能返回原始
+	 * Bean 的包装器。
+ 	 */
 	@Override
 	public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName)
 			throws BeansException {
@@ -444,7 +458,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			// 默认实现按原样返回给定的 Bean
 			Object current = processor.postProcessBeforeInitialization(result, beanName);
 
-			// 如果 current 为空
+			// 如果 current 为空。即一旦 Bean 的 BeanPostProcessors 中的某一个增强处理器返回 null, 后续 BeanPostProcessor 对象的 postProcessBeforeInitialization 方法不在执行, 直接退出后续循环
 			if (current == null) {
 				// 直接返回 result, 中断其后续的 BeanPostProcessor 处理器
 				return result;
@@ -603,11 +617,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// 获取 FactoryBean 实例缓存
 		if (mbd.isSingleton()) {
-			// 如果是单实例 Bean 则从 FactoryBean 实例缓存中移除当前 Bean 的定义信息
+			// 如果是单实例 Bean 则从 FactoryBean 实例缓存中取出并移除当前 Bean 的定义信息
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 
-		// 如果 Bean 实例空则创建 Bean
+		// 如果 Bean 实例为空则创建 Bean --> 如果不是单例模式或者 FactoryBean 实例缓存中没有对应的 value 则调用 createBeanInstance 方法
 		if (instanceWrapper == null) {
 			// 根据执行 Bean 使用对应的策略创建新的实例。如 : 工厂方法、构造函数主动注入、简单初始化
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
@@ -622,15 +636,17 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// 如果获取的 Bean 对象的 Class 属性不等于 NullBean 类型, 则修改目标类型
 		if (beanType != NullBean.class) {
+			// 将 RootBeanDefinition 中的解析类型属性设置为当前获取到的具体 beanType 进行缓存
 			mbd.resolvedTargetType = beanType;
 		}
 
 		// Allow post-processors to modify the merged bean definition.
-		// 允许 BeanPostProcessor 去修改合并的 BeanDefinition
+		// 使用后置处理器, 对其进行处理。允许 BeanPostProcessor 去修改合并的 BeanDefinition
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
 				try {
-					// MergedBeanDefinitionPostProcessor 后置处理器修改合并 Bean 的定义
+					// MergedBeanDefinitionPostProcessor 后置处理器修改合并 BeanDefinition 定义信息
+					// 修改合并之后的 BeanDefinition。对@Autowired、@Value等注解正是通过此方法实现诸如类型的预解析(参考 AutowiredAnnotationBeanPostProcessor 的处理相关逻辑), 主要是调用了 MergedBeanDefinitionPostProcessor 的 postProcessMergedBeanDefinition 方法
 					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
 				}
 				catch (Throwable ex) {
@@ -644,6 +660,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Eagerly cache singletons to be able to resolve circular references
 		// even when triggered by lifecycle interfaces like BeanFactoryAware.
 		// 判断当前 Bean 是否需要提前曝光 : 单例 && 允许循环依赖 && 当前 Bean 正在创建中。检测循环依赖
+		// 这里主要是调通 addSingletonFactory 方法往缓存 singletonFactories 中放入一个 ObjectFactory。
+		// 当其它的 Bean 实例对当前创建的 Bean 实例有依赖时, 可以提前获取到。getEarlyBeanReference 方法就
+		// 是获取一个引用, 里面主要是调用了 SmartInstantiationAwareBeanPostProcessor 的 getEarlyBeanReference 方法， 以便解决循环依赖问题。
+		// 这里一般都是 Bean 本身。在 AOP 时则是代理对象
 		boolean earlySingletonExposure = (mbd.isSingleton() && this.allowCircularReferences &&
 				isSingletonCurrentlyInCreation(beanName));
 		if (earlySingletonExposure) {
@@ -651,7 +671,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				logger.trace("Eagerly caching bean '" + beanName +
 						"' to allow for resolving potential circular references");
 			}
+			// 循环依赖处理, 这里有一个放入缓存的处理。以便其它的依赖此 Bean 的 Bean 可以提前获取到, 这里调通了 SmartInstantiationAwareBeanPostProcessor 的 getEarlyBeanReference 方法进行 Bean 的提前曝光
 			// 为避免后期循环依赖, 可以在 Bean 初始化完成前将创建实例的 ObjectFactory 加入工厂
+			// 其中 AOP 就是在这里将 advice 进行动态织入, 若没有直接返回 Bean
 			addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, mbd, bean));
 
 			// 只保留二级缓存, 不向三级缓存中存放对象
@@ -662,10 +684,17 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Initialize the bean instance.
 		// 初始化 Bean 实例
 		Object exposedObject = bean;
+		// 先进行 Bean 属性填充, 后执行 Bean 的初始化逻辑
 		try {
 			// 对 Bean 的属性进行填充, 将各个属性值注入。其中可能存在依赖于其他 Bean 的属性, 则会递归初始化依赖的 Bean
 			populateBean(beanName, mbd, instanceWrapper);
+
 			// 执行 Bean 的初始化逻辑
+			// Spring 调通 set 方法注入 Aware 相关接口对象
+			// 调用后置处理器 BeanPostProcessor 中的 postProcessBeforeInitialization 方法
+			// 调用 InitializingBean 接口中的 afterPropertiesSet 方法
+			// 调用 init-method, 调通 Bean 对象指定的初始化方法
+			// 调用后置处理 BeanPostProcessor 中的 postProcessAfterInitialization 方法
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
 		}
 		catch (Throwable ex) {
@@ -680,18 +709,28 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		if (earlySingletonExposure) {
 			Object earlySingletonReference = getSingleton(beanName, false);
+			// earlySingletonReference 只有检查到有循环依赖的情况下才不会为空
 			if (earlySingletonReference != null) {
+				// 如果 exposedObject 没有在初始化方法中被改变, 也就是没有被增强处理
 				if (exposedObject == bean) {
 					exposedObject = earlySingletonReference;
 				}
 				else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
+
+					// getDependentBeans(beanName) : 循环依赖检查
+					// 检查是否还有依赖的 Bean 实例没有创建
 					String[] dependentBeans = getDependentBeans(beanName);
 					Set<String> actualDependentBeans = new LinkedHashSet<>(dependentBeans.length);
+
+					// 检查依赖
 					for (String dependentBean : dependentBeans) {
 						if (!removeSingletonIfCreatedForTypeCheckOnly(dependentBean)) {
 							actualDependentBeans.add(dependentBean);
 						}
 					}
+
+					// 因为 Bean 创建后当前创建 Bean 所依赖的 Bean 一定是已经创建了的
+					// actualDependentBeans 不为空表示当前 Bean 创建后依赖的 Bean 却没有全部创建, 换而言之就是存在循环依赖
 					if (!actualDependentBeans.isEmpty()) {
 						throw new BeanCurrentlyInCreationException(beanName,
 								"Bean with name '" + beanName + "' has been injected into other beans [" +
@@ -706,6 +745,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// Register bean as disposable.
+		// 注册 DisposableBean。以便在销毁 Bean 实例的时候后置处理也会生效, 可以在 Bean 销毁时处理指定的相关业务
 		try {
 			registerDisposableBeanIfNecessary(beanName, bean, mbd);
 		}
