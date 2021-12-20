@@ -665,7 +665,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		try {
 			// 对 Bean 的属性进行填充, 将各个属性值注入。其中可能存在依赖于其他 Bean 的属性, 则会递归初始化依赖的 Bean
 			populateBean(beanName, mbd, instanceWrapper);
-			// 执行初始化逻辑
+			// 执行 Bean 的初始化逻辑
 			exposedObject = initializeBean(beanName, exposedObject, mbd);
 		}
 		catch (Throwable ex) {
@@ -1878,12 +1878,17 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		if (mbd == null || !mbd.isSynthetic()) {
 			// 将 BeanPostProcessor 应用到给定的现有 Bean 实例, 调用它们的 PostProcessorsBeforeInitialization 初始化方法
 			// 返回的 Bean 实例可能是原始 Bean 包装器
-			// 执行 applyBeanPostProcessorsBeforeInitialization 方法后会将 ApplicationConext 注入进来
+			// 执行 applyBeanPostProcessorsBeforeInitialization 方法后会将 ApplicationContext 注入进来
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 
 		try {
 			// 调用初始化方法, 先调用 Bean 的 InitializeBean 接口方法, 后调用 Bean 的自定义初始化方法
+			// invokeInitMethods() 方法的作用是执行初始化方法, 这些初始化方法包括 :
+			// 1.在 XML 文件中的 <bean></bean> 标签中使用的 init-method 属性的 Bean 初始化方法;
+			// 2.在 @Bean 注解中使用 initMethod 属性指定的 Bean 初始化方法;
+			// 3.使用 @PostConstruct 注解标注的方法;
+			// 4.实现 InitializingBean 接口的方法等;
 			invokeInitMethods(beanName, wrappedBean, mbd);
 		}
 		catch (Throwable ex) {
