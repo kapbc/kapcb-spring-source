@@ -724,12 +724,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 					// 检查依赖
 					for (String dependentBean : dependentBeans) {
+						// 如果当前 Bean 依赖的 Bean 还未创建, 则代表当前 Bean 还存在循环依赖
 						if (!removeSingletonIfCreatedForTypeCheckOnly(dependentBean)) {
+							// 将依赖的 BeanName 加入 actualDependentBeans 容器中, 用于后续循环依赖的判断
 							actualDependentBeans.add(dependentBean);
 						}
 					}
 
-					// 因为 Bean 创建后当前创建 Bean 所依赖的 Bean 一定是已经创建了的
+					// 因为 Bean 创建后当前创建 Bean 所依赖的 Bean 一定是已经创建了的, 即 : 当一个 Bean 创建完成, 那么其依赖
+					// 的所有 Bean 都将创建完成。如果有未创建完成的依赖的 Bean 则代表有循环引用
 					// actualDependentBeans 不为空表示当前 Bean 创建后依赖的 Bean 却没有全部创建, 换而言之就是存在循环依赖
 					if (!actualDependentBeans.isEmpty()) {
 						throw new BeanCurrentlyInCreationException(beanName,
