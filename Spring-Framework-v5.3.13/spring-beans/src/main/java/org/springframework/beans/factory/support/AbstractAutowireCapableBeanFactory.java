@@ -461,13 +461,18 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			throws BeansException {
 
 		Object result = existingBean;
+
+		// 获取创建 Bean 实例对象过程中所有的 BeanPostProcessors(Bean后置处理器)
 		for (BeanPostProcessor processor : getBeanPostProcessors()) {
+			// 如果 Bean 被子类标记为代理, 则使用配置的拦截器创建一个代理
 			Object current = processor.postProcessAfterInitialization(result, beanName);
 			if (current == null) {
 				return result;
 			}
+			// 让 result 引用 processor 返回的结果, 使其经过所有 BeanPostProcessor 对象的后置处理器的层层包装
 			result = current;
 		}
+		// 返回经过所有 BeanPostProcessor 对象的后置处理器的层层包装后的 result
 		return result;
 	}
 
