@@ -54,6 +54,13 @@ import org.springframework.lang.Nullable;
  * @see DestructionAwareBeanPostProcessor
  * @see ConfigurableBeanFactory#addBeanPostProcessor
  * @see BeanFactoryPostProcessor
+ *
+ * BeanPostProcessor 接口是 Spring 本着面对扩展开放原则, 允许开发者在 Bean 实例化前后,
+ * 对 Bean 做一些特殊的处理(如修改 BeanDefinition 等)。
+ * 接口中提供两个默认方法:
+ * 1.postProcessBeforeInitialization : 用于 Bean 实例化前
+ * 2.postProcessAfterInitialization : 用于 Bean 实例化后
+ *
  */
 public interface BeanPostProcessor {
 
