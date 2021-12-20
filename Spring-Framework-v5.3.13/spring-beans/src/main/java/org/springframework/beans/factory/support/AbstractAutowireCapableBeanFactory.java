@@ -431,6 +431,20 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return initializeBean(beanName, existingBean, null);
 	}
 
+	/**
+	 * @param existingBean the existing bean instance
+	 * @param beanName the name of the bean, to be passed to it if necessary
+	 * (only passed to {@link BeanPostProcessor BeanPostProcessors};
+	 * can follow the {@link #ORIGINAL_INSTANCE_SUFFIX} convention in order to
+	 * enforce the given instance to be returned, i.e. no proxies etc)
+	 * @return BeansException
+	 * @throws BeansException
+	 *
+	 * 注意 : 在执行此方法之前已经执行了 populateBean 方法为 Bean 中的属性进行了填充。
+	 * 此时 Bean 实例已经通过反射创建完成并且 Bean 中的属性也已经填充完毕, 调用此方法之
+	 * 后将会返回通过该 Bean 的 BeanPostProcessor 层层包装的 Bean, 也有可能返回原始
+	 * Bean 的包装器。
+ 	 */
 	@Override
 	public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName)
 			throws BeansException {
@@ -444,7 +458,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			// 默认实现按原样返回给定的 Bean
 			Object current = processor.postProcessBeforeInitialization(result, beanName);
 
-			// 如果 current 为空
+			// 如果 current 为空。即一旦 Bean 的 BeanPostProcessors 中的某一个增强处理器返回 null, 后续 BeanPostProcessor 对象的 postProcessBeforeInitialization 方法不在执行, 直接退出后续循环
 			if (current == null) {
 				// 直接返回 result, 中断其后续的 BeanPostProcessor 处理器
 				return result;
