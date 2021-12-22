@@ -216,20 +216,27 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	/**
 	 * Parse an "import" element and load the bean definitions
 	 * from the given resource into the bean factory.
+	 *
+	 * 解析 XML 配置文件中的 <bean></bean> 标签
 	 */
 	protected void importBeanDefinitionResource(Element ele) {
+		// 获取 import 标签中的 resource 属性值
 		String location = ele.getAttribute(RESOURCE_ATTRIBUTE);
+		// resource 不能为空
 		if (!StringUtils.hasText(location)) {
 			getReaderContext().error("Resource location must not be empty", ele);
 			return;
 		}
 
 		// Resolve system properties: e.g. "${user.dir}"
+		// 对于 import 标签, Spring 会优先从 System.getProperties() 和 System.getEnvironment() 中获取属性, 优先 System.getProperties()
+		// 即优先系统变量, 环境变量其次
 		location = getReaderContext().getEnvironment().resolveRequiredPlaceholders(location);
 
 		Set<Resource> actualResources = new LinkedHashSet<>(4);
 
 		// Discover whether the location is an absolute or relative URI
+		// resource 支持 url 模式, 找到相应的资源并进行加载
 		boolean absoluteLocation = false;
 		try {
 			absoluteLocation = ResourcePatternUtils.isUrl(location) || ResourceUtils.toURI(location).isAbsolute();
@@ -256,6 +263,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			// No URL -> considering resource location as relative to the current file.
 			try {
 				int importCount;
+				// 相对路径, 相对于当前文件
 				Resource relativeResource = getReaderContext().getResource().createRelative(location);
 				if (relativeResource.exists()) {
 					importCount = getReaderContext().getReader().loadBeanDefinitions(relativeResource);
