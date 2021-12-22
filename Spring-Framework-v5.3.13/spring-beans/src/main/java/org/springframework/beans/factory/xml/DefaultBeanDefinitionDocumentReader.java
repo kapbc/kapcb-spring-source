@@ -164,18 +164,25 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * Parse the elements at the root level in the document:
 	 * "import", "alias", "bean".
 	 * @param root the DOM root element of the document
+	 *
+	 * 解析 XML 配置文件中的 import 标签、alias 标签、bean 标签和自定标签
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
+		// 检查 <beans> 根标签的命名空间是否为空或者是 http://www.springframework.org/schema/beans
 		if (delegate.isDefaultNamespace(root)) {
+			// 遍历其下的子节点
 			NodeList nl = root.getChildNodes();
 			for (int i = 0; i < nl.getLength(); i++) {
 				Node node = nl.item(i);
 				if (node instanceof Element) {
 					Element ele = (Element) node;
+					// 每个子节点都有命名空间
 					if (delegate.isDefaultNamespace(ele)) {
+						// 处理默认名称空间 : <import></import>标签、<alias></alias>标签、<bean></bean>标签、和内置<beans></beans>标签
 						parseDefaultElement(ele, delegate);
 					}
 					else {
+						// 解析自定义标签如 : <context:component-scan base-package="xxx.xxx.xxx"/>
 						delegate.parseCustomElement(ele);
 					}
 				}
