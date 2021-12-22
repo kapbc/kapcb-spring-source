@@ -292,11 +292,15 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 	/**
 	 * Process the given alias element, registering the alias with the registry.
+	 *
+	 * 解析 XML 文件中的 <alias></alias> 标签, 主要作用就是缓存全局别名
 	 */
 	protected void processAliasRegistration(Element ele) {
+		// 获取 alias 标签的 name 和 alias 属性值 : e.g. <alias name = "key" alias = "value">
 		String name = ele.getAttribute(NAME_ATTRIBUTE);
 		String alias = ele.getAttribute(ALIAS_ATTRIBUTE);
 		boolean valid = true;
+		// 确保标签中的 name 和 alias 属性都有值
 		if (!StringUtils.hasText(name)) {
 			getReaderContext().error("Name must not be empty", ele);
 			valid = false;
@@ -307,6 +311,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 		if (valid) {
 			try {
+				// 全局设置, 会将其保存到 DefaultListableFactory 的父级类 SimpleAliasRegistry#aliasMap 中
 				getReaderContext().getRegistry().registerAlias(name, alias);
 			}
 			catch (Exception ex) {
