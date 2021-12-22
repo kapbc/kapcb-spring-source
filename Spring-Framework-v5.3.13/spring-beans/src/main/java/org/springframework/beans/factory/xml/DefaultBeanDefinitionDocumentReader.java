@@ -164,18 +164,25 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * Parse the elements at the root level in the document:
 	 * "import", "alias", "bean".
 	 * @param root the DOM root element of the document
+	 *
+	 * 解析 XML 配置文件中的 import 标签、alias 标签、bean 标签和自定标签
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
+		// 检查 <beans> 根标签的命名空间是否为空或者是 http://www.springframework.org/schema/beans
 		if (delegate.isDefaultNamespace(root)) {
+			// 遍历其下的子节点
 			NodeList nl = root.getChildNodes();
 			for (int i = 0; i < nl.getLength(); i++) {
 				Node node = nl.item(i);
 				if (node instanceof Element) {
 					Element ele = (Element) node;
+					// 每个子节点都有命名空间
 					if (delegate.isDefaultNamespace(ele)) {
+						// 处理默认名称空间 : <import></import>标签、<alias></alias>标签、<bean></bean>标签、和内置<beans></beans>标签
 						parseDefaultElement(ele, delegate);
 					}
 					else {
+						// 解析自定义标签如 : <context:component-scan base-package="xxx.xxx.xxx"/>
 						delegate.parseCustomElement(ele);
 					}
 				}
@@ -187,17 +194,21 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	}
 
 	private void parseDefaultElement(Element ele, BeanDefinitionParserDelegate delegate) {
+		// import 标签解析
 		if (delegate.nodeNameEquals(ele, IMPORT_ELEMENT)) {
 			importBeanDefinitionResource(ele);
 		}
+		// alias 标签解析
 		else if (delegate.nodeNameEquals(ele, ALIAS_ELEMENT)) {
 			processAliasRegistration(ele);
 		}
+		// bean 标签解析
 		else if (delegate.nodeNameEquals(ele, BEAN_ELEMENT)) {
 			processBeanDefinition(ele, delegate);
 		}
+		// 嵌套 beans 标签
 		else if (delegate.nodeNameEquals(ele, NESTED_BEANS_ELEMENT)) {
-			// recurse
+			// recurse 递归解析
 			doRegisterBeanDefinitions(ele);
 		}
 	}
@@ -205,20 +216,27 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	/**
 	 * Parse an "import" element and load the bean definitions
 	 * from the given resource into the bean factory.
+	 *
+	 * 解析 XML 配置文件中的 <bean></bean> 标签
 	 */
 	protected void importBeanDefinitionResource(Element ele) {
+		// 获取 import 标签中的 resource 属性值
 		String location = ele.getAttribute(RESOURCE_ATTRIBUTE);
+		// resource 不能为空
 		if (!StringUtils.hasText(location)) {
 			getReaderContext().error("Resource location must not be empty", ele);
 			return;
 		}
 
 		// Resolve system properties: e.g. "${user.dir}"
+		// 对于 import 标签, Spring 会优先从 System.getProperties() 和 System.getEnvironment() 中获取属性, 优先 System.getProperties()
+		// 即优先系统变量, 环境变量其次
 		location = getReaderContext().getEnvironment().resolveRequiredPlaceholders(location);
 
 		Set<Resource> actualResources = new LinkedHashSet<>(4);
 
 		// Discover whether the location is an absolute or relative URI
+		// resource 支持 url 模式, 找到相应的资源并进行加载
 		boolean absoluteLocation = false;
 		try {
 			absoluteLocation = ResourcePatternUtils.isUrl(location) || ResourceUtils.toURI(location).isAbsolute();
@@ -245,6 +263,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			// No URL -> considering resource location as relative to the current file.
 			try {
 				int importCount;
+				// 相对路径, 相对于当前文件
 				Resource relativeResource = getReaderContext().getResource().createRelative(location);
 				if (relativeResource.exists()) {
 					importCount = getReaderContext().getReader().loadBeanDefinitions(relativeResource);
