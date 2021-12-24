@@ -74,17 +74,20 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private static final int SUPPRESSED_EXCEPTIONS_LIMIT = 100;
 
 
-	// 单例对象的一级缓存 key -> beanName, value -> beanInstance
+	// 单例对象的一级缓存 key -> beanName, value -> BeanInstance
 	/** Cache of singleton objects: bean name to bean instance. */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
-	// 单例对象的
+	// 单例对象的三级缓存 key -> beanName, value -> ObjectFactory
 	/** Cache of singleton factories: bean name to ObjectFactory. */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
+	// 单例对象的二级缓存 key -> beanName, value -> BeanInstance
 	/** Cache of early singleton objects: bean name to bean instance. */
 	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
 
+	// 除了三级缓存以外, 还有一个 Set 集合用于保存正在创建的 bean 的 beanName
+	// value -> beanName
 	/** Set of registered singletons, containing the bean names in registration order. */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
