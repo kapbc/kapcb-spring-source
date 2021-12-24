@@ -259,7 +259,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		// Eagerly check singleton cache for manually registered singletons.
 		// 提前检查单例缓存中是否有手动注册的单实例 Bean 对象, 与处理循环依赖有关联
-		// 我们自定义 Bean 一般在这一步获取到的都是 null
+		// 我们自定义 Bean 一般在这一步获取到的都是 null, 其实就是调用了 DefaultSingletonBeanRegistry#getSingleton(beanName, true) 方法
 		Object sharedInstance = getSingleton(beanName);
 
 		// 如果 Bean 的单例对象找到了, 并且没有创建实例时需要使用的参数
