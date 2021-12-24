@@ -75,14 +75,17 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 
 	// 单例对象的一级缓存 key -> beanName, value -> BeanInstance
+	// 此容器中保存的 BeanInstance 为完整 Bean 实例
 	/** Cache of singleton objects: bean name to bean instance. */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
 	// 单例对象的三级缓存 key -> beanName, value -> ObjectFactory
+	// 此时容器中保存的是实例化 Bean 的 ObjectFactory
 	/** Cache of singleton factories: bean name to ObjectFactory. */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
 	// 单例对象的二级缓存 key -> beanName, value -> BeanInstance
+	// 此时容器中保存的 BeanInstance 并非完整的 Bean 实例
 	/** Cache of early singleton objects: bean name to bean instance. */
 	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
 
@@ -91,6 +94,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/** Set of registered singletons, containing the bean names in registration order. */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
+	// 此容器中保存当前正在创建的 bean 实例的 beanName
 	/** Names of beans that are currently in creation. */
 	private final Set<String> singletonsCurrentlyInCreation =
 			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
@@ -172,6 +176,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	@Override
 	@Nullable
 	public Object getSingleton(String beanName) {
+		// 从 Spring 三级缓存中根据 beanName 获取单实例 bean 对象, 允许创建早期对象引用
 		return getSingleton(beanName, true);
 	}
 
