@@ -188,20 +188,37 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 		// Quick check for existing instance without full singleton lock
+		// 在一级缓存 singletonObjects 中获取
 		Object singletonObject = this.singletonObjects.get(beanName);
+		// 如果没有从一级缓存中获取到, 并且获取的 bean 正在创建中
+		// 判断 bean 对象是否正在创建中就是判断当前 beanName 是否在 singletonsCurrentlyInCreation 这个 Set 集合中
 		if (singletonObject == null && isSingletonCurrentlyInCreation(beanName)) {
+			// 从二级缓存 earlySingletonObjects 中获取
 			singletonObject = this.earlySingletonObjects.get(beanName);
+			// 如果没有从二级缓存中获取到, 并且允许 bean 的提前引用
 			if (singletonObject == null && allowEarlyReference) {
+				// 进入同步代码块
 				synchronized (this.singletonObjects) {
 					// Consistent creation of early reference within full singleton lock
+					// 再次从 singletonObjects 一级缓存中获取
 					singletonObject = this.singletonObjects.get(beanName);
+					// 如果没有从一级缓存中获取到
 					if (singletonObject == null) {
+						// 再次从 earlySingletonObjects 二级缓存中获取
 						singletonObject = this.earlySingletonObjects.get(beanName);
+						// 如果没有获取到
 						if (singletonObject == null) {
+							// 从三级缓存中获取, 三级缓存中获取到的不是我们需要的实例, 三级缓存中保存的是 ObjectFactory 是一个工厂
 							ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
+							// 如果从三级缓存中获取到
 							if (singletonFactory != null) {
+								// 从对象工厂中获取 bean 实例对象(调通工厂方法获取 bean 实例对象, lambda 表达式回调获取)
 								singletonObject = singletonFactory.getObject();
+								// 放入二级缓存中, 一级缓存用于存放完整实例化的 bean 实例, 此时获取的 bean 实例并非完整的 bean 实例
+								// 如果此时将获取的不完整的 bean 实例放入一级缓存中, 后续 bean 完成最终实例化之后又会将其放入一级缓存
+								// 此时一级缓存中就会同时存在两个相同 beanName 的 bean 实例。二级缓存只是暂时存放。
 								this.earlySingletonObjects.put(beanName, singletonObject);
+								// 将获取到的对象工厂从三级缓存中移除
 								this.singletonFactories.remove(beanName);
 							}
 						}
