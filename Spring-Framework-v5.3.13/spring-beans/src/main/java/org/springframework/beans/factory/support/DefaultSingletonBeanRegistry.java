@@ -74,9 +74,11 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private static final int SUPPRESSED_EXCEPTIONS_LIMIT = 100;
 
 
+	// 单例对象的一级缓存 key -> beanName, value -> beanInstance
 	/** Cache of singleton objects: bean name to bean instance. */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
+	// 单例对象的
 	/** Cache of singleton factories: bean name to ObjectFactory. */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
@@ -94,10 +96,12 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private final Set<String> inCreationCheckExclusions =
 			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 
+	// 抑制的异常列表, 可用于关联相关原因
 	/** Collection of suppressed Exceptions, available for associating related causes. */
 	@Nullable
 	private Set<Exception> suppressedExceptions;
 
+	// 指示当前 bean 对象是否在 destroySingletons 中的标志
 	/** Flag that indicates whether we're currently within destroySingletons. */
 	private boolean singletonsCurrentlyInDestruction = false;
 
@@ -175,6 +179,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param beanName the name of the bean to look for
 	 * @param allowEarlyReference whether early references should be created or not
 	 * @return the registered singleton object, or {@code null} if none found
+	 *
+	 * 三级缓存获取容器中的单实例 Bean 对象
 	 */
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
@@ -208,22 +214,33 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * creating and registering a new one if none registered yet.
 	 * @param beanName the name of the bean
 	 * @param singletonFactory the ObjectFactory to lazily create the singleton
-	 * with, if necessary
-	 * @return the registered singleton object
+	 * with, if necessary  -- 必要时惰性地创建单例的 ObjectFactory
+	 * @return the registered singleton object  -- 注册的单例对象
+	 *
+	 * 返回以给定名称注册的(原始)单例对象, 如果尚未注册, 则创建并注册一个对象
 	 */
 	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
+		// beanName 属性校验
 		Assert.notNull(beanName, "Bean name must not be null");
+		// 同步一级缓存, 保证线程安全
 		synchronized (this.singletonObjects) {
+			// 从一级缓存中获取 beanName 对应的单例对象
 			Object singletonObject = this.singletonObjects.get(beanName);
+			// 如果获取不到对象
 			if (singletonObject == null) {
+				// 如果当前正在 destroy 中
 				if (this.singletonsCurrentlyInDestruction) {
+					// 抛出不允许创建 Bean 异常 : 在工厂的单例销毁时不允许创建单例 Bean (请勿在 destroy 方法中向 BeanFactory 请求获取 Bean 实例)
 					throw new BeanCreationNotAllowedException(beanName,
 							"Singleton bean creation not allowed while singletons of this factory are in destruction " +
 							"(Do not request a bean from a BeanFactory in a destroy method implementation!)");
 				}
+				// 如果为 Debug 级别日志
 				if (logger.isDebugEnabled()) {
+					// 创建共享的单实例 Bean
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
+				// 创建单例之前的回调, 默认实现将单例注册为当前正在创建中
 				beforeSingletonCreation(beanName);
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
