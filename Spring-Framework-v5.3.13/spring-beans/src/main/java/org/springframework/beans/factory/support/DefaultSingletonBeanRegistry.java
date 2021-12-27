@@ -129,12 +129,16 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	public void registerSingleton(String beanName, Object singletonObject) throws IllegalStateException {
 		Assert.notNull(beanName, "Bean name must not be null");
 		Assert.notNull(singletonObject, "Singleton object must not be null");
+		// 进入同步代码块, 全局锁定
 		synchronized (this.singletonObjects) {
+			// 将指定的 bean 实例添加到 Spring IOC 容器的一级缓存中
 			Object oldObject = this.singletonObjects.get(beanName);
 			if (oldObject != null) {
+				// 如果在添加的时候一级缓存中已经存在该 beanName 对应的实例
 				throw new IllegalStateException("Could not register object [" + singletonObject +
 						"] under bean name '" + beanName + "': there is already object [" + oldObject + "] bound");
 			}
+			// 添加单例 bean 实例到 IOC 容器中
 			addSingleton(beanName, singletonObject);
 		}
 	}
