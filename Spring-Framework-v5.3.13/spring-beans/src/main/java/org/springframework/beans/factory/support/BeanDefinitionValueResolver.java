@@ -315,24 +315,34 @@ class BeanDefinitionValueResolver {
 	@Nullable
 	private Object resolveReference(Object argName, RuntimeBeanReference ref) {
 		try {
+			// 定义一个存储 Bean 对象的变量
 			Object bean;
+			// 获取另一个 Bean 引用的 Bean 的类型
 			Class<?> beanType = ref.getBeanType();
+			// 如果引用来自父工厂
 			if (ref.isToParent()) {
+				// 获取父工厂
 				BeanFactory parent = this.beanFactory.getParentBeanFactory();
+				// 如果没有父工厂
 				if (parent == null) {
+					// 抛出 BeanCreatingException : 无法解析对 bean 的引用, ref在父工厂中 : 没有可用的父工厂
 					throw new BeanCreationException(
 							this.beanDefinition.getResourceDescription(), this.beanName,
 							"Cannot resolve reference to bean " + ref +
 									" in parent factory: no parent factory available");
 				}
+				// 如果引用的 Bean 类型不为 null
 				if (beanType != null) {
+					// 从父工厂中获取引用的 Bean 类型对应的 Bean 实例对象
 					bean = parent.getBean(beanType);
 				}
 				else {
+					// 否则使用引用 Bean 的 BeanName, 从父工厂中获取对应的 Bean 实例对象
 					bean = parent.getBean(String.valueOf(doEvaluate(ref.getBeanName())));
 				}
 			}
 			else {
+				//
 				String resolvedName;
 				if (beanType != null) {
 					NamedBeanHolder<?> namedBean = this.beanFactory.resolveNamedBean(beanType);
