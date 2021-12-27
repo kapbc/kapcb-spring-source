@@ -89,7 +89,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/** Cache of early singleton objects: bean name to bean instance. */
 	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
 
-	// 除了三级缓存以外, 还有一个 Set 集合用于保存正在创建的 bean 的 beanName
+	// 除了三级缓存以外, 还有一个 Set 集合用于保存已经创建成功(完全实例化)的 bean 的 beanName
 	// value -> beanName
 	/** Set of registered singletons, containing the bean names in registration order. */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
@@ -129,12 +129,16 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	public void registerSingleton(String beanName, Object singletonObject) throws IllegalStateException {
 		Assert.notNull(beanName, "Bean name must not be null");
 		Assert.notNull(singletonObject, "Singleton object must not be null");
+		// 进入同步代码块, 全局锁定
 		synchronized (this.singletonObjects) {
+			// 将指定的 bean 实例添加到 Spring IOC 容器的一级缓存中
 			Object oldObject = this.singletonObjects.get(beanName);
 			if (oldObject != null) {
+				// 如果在添加的时候一级缓存中已经存在该 beanName 对应的实例
 				throw new IllegalStateException("Could not register object [" + singletonObject +
 						"] under bean name '" + beanName + "': there is already object [" + oldObject + "] bound");
 			}
+			// 添加单例 bean 实例到 IOC 容器中
 			addSingleton(beanName, singletonObject);
 		}
 	}
@@ -147,9 +151,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	protected void addSingleton(String beanName, Object singletonObject) {
 		synchronized (this.singletonObjects) {
+			// 将 beanName 和 bean 实例对象放入一级缓存
 			this.singletonObjects.put(beanName, singletonObject);
+			// 根据 beanName 移除三级缓存中的 bean 实例
 			this.singletonFactories.remove(beanName);
+			// 根据 beanName 移除二级缓存中的 bean 实例
 			this.earlySingletonObjects.remove(beanName);
+			// 标记该 bean 已创建完成
 			this.registeredSingletons.add(beanName);
 		}
 	}
@@ -164,10 +172,15 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(singletonFactory, "Singleton factory must not be null");
+		// 进入同步代码块
 		synchronized (this.singletonObjects) {
+			// 如果一级缓存中不存在该 beanName 的实例 --> 该 bean 并没有完全实例化
 			if (!this.singletonObjects.containsKey(beanName)) {
+				// 往三级缓存添加该 beanName 和 对应的 ObjectFactory
 				this.singletonFactories.put(beanName, singletonFactory);
+				// 从二级缓存中移除该 beanName 的信息
 				this.earlySingletonObjects.remove(beanName);
+				// 标记为已创建完成
 				this.registeredSingletons.add(beanName);
 			}
 		}
