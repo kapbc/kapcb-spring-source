@@ -94,7 +94,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/** Set of registered singletons, containing the bean names in registration order. */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
-	// 此容器中保存当前正在创建的 bean 实例的 beanName
+	// 保存当前正在创建的 bean 实例的 beanName
 	/** Names of beans that are currently in creation. */
 	private final Set<String> singletonsCurrentlyInCreation =
 			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
@@ -103,24 +103,28 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private final Set<String> inCreationCheckExclusions =
 			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 
-	// 抑制的异常列表, 可用于关联相关原因
+	// 抑制的异常列表, 用于存放异常出现的相关原因容器, 可用于关联相关原因
 	/** Collection of suppressed Exceptions, available for associating related causes. */
 	@Nullable
 	private Set<Exception> suppressedExceptions;
 
-	// 指示当前 bean 对象是否在 destroySingletons 中的标志
+	// 指示当前 bean 对象是否在 destroySingletons(销毁单例) 中的标志
 	/** Flag that indicates whether we're currently within destroySingletons. */
 	private boolean singletonsCurrentlyInDestruction = false;
 
+	// 存放一次性 bean 实例的缓存
 	/** Disposable bean instances: bean name to disposable instance. */
 	private final Map<String, Object> disposableBeans = new LinkedHashMap<>();
 
+	// 外部 bean 与被包含在外部 bean 的所有内部 bean 集合包含关系的缓存
 	/** Map between containing bean names: bean name to Set of bean names that the bean contains. */
 	private final Map<String, Set<String>> containedBeanMap = new ConcurrentHashMap<>(16);
 
+	// 指定 bean 与依赖指定 bean 的所有 bean 的依赖关系的缓存
 	/** Map between dependent bean names: bean name to Set of dependent bean names. */
 	private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<>(64);
 
+	// 指定 bean 与创建这个 bean 所需依赖的所有 bean 的依赖关系的缓存
 	/** Map between depending bean names: bean name to Set of bean names for the bean's dependencies. */
 	private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<>(64);
 
