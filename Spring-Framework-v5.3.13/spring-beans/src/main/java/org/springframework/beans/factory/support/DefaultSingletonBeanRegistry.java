@@ -67,6 +67,13 @@ import org.springframework.util.StringUtils;
  * @see #registerDisposableBean
  * @see org.springframework.beans.factory.DisposableBean
  * @see org.springframework.beans.factory.config.ConfigurableBeanFactory
+ *
+ * 共享 Bean 实例的通用注册表, 实现了 SingletonBeanRegistry。允许注册表中注册的单例应该被所有调用者共享, 通过 beanName 名称获得。
+ *
+ * 支持等级的 DisposableBean 实例(这可能会或者不能正确的注册单例), 关闭注册表时 destroyed。
+ * 可以注册 bean 实例之间的依赖关系, 执行适当的关闭顺序。
+ *
+ * 这个类主要作用基类的 BeanFactory, 提供基本的管理 Singleton Bean 实例的功能
  */
 public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements SingletonBeanRegistry {
 
@@ -94,7 +101,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/** Set of registered singletons, containing the bean names in registration order. */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
-	// 此容器中保存当前正在创建的 bean 实例的 beanName
+	// 保存当前正在创建的 bean 实例的 beanName
 	/** Names of beans that are currently in creation. */
 	private final Set<String> singletonsCurrentlyInCreation =
 			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
@@ -103,24 +110,28 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private final Set<String> inCreationCheckExclusions =
 			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 
-	// 抑制的异常列表, 可用于关联相关原因
+	// 抑制的异常列表, 用于存放异常出现的相关原因容器, 可用于关联相关原因
 	/** Collection of suppressed Exceptions, available for associating related causes. */
 	@Nullable
 	private Set<Exception> suppressedExceptions;
 
-	// 指示当前 bean 对象是否在 destroySingletons 中的标志
+	// 指示当前 bean 对象是否在 destroySingletons(销毁单例) 中的标志
 	/** Flag that indicates whether we're currently within destroySingletons. */
 	private boolean singletonsCurrentlyInDestruction = false;
 
+	// 存放一次性 bean 实例的缓存
 	/** Disposable bean instances: bean name to disposable instance. */
 	private final Map<String, Object> disposableBeans = new LinkedHashMap<>();
 
+	// 外部 bean 与被包含在外部 bean 的所有内部 bean 集合包含关系的缓存
 	/** Map between containing bean names: bean name to Set of bean names that the bean contains. */
 	private final Map<String, Set<String>> containedBeanMap = new ConcurrentHashMap<>(16);
 
+	// 指定 bean 与依赖指定 bean 的所有 bean 的依赖关系的缓存
 	/** Map between dependent bean names: bean name to Set of dependent bean names. */
 	private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<>(64);
 
+	// 指定 bean 与创建这个 bean 所需依赖的所有 bean 的依赖关系的缓存
 	/** Map between depending bean names: bean name to Set of bean names for the bean's dependencies. */
 	private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<>(64);
 
@@ -172,7 +183,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	protected void addSingletonFactory(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(singletonFactory, "Singleton factory must not be null");
-		// 进入同步代码块
+		// 使用singletonObjects进行加锁, 保证线程安全
 		synchronized (this.singletonObjects) {
 			// 如果一级缓存中不存在该 beanName 的实例 --> 该 bean 并没有完全实例化
 			if (!this.singletonObjects.containsKey(beanName)) {
@@ -264,13 +275,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
 		// beanName 属性校验
 		Assert.notNull(beanName, "Bean name must not be null");
-		// 同步一级缓存, 保证线程安全
+		// 使用单例对象的高速缓存 Map 作为锁, 保证线程安全
 		synchronized (this.singletonObjects) {
 			// 从一级缓存中获取 beanName 对应的单例对象
 			Object singletonObject = this.singletonObjects.get(beanName);
 			// 如果获取不到对象
 			if (singletonObject == null) {
-				// 如果当前正在 destroy 中
+				// 如果当前正在 destroySingleton 中
 				if (this.singletonsCurrentlyInDestruction) {
 					// 抛出不允许创建 Bean 异常 : 在工厂的单例销毁时不允许创建单例 Bean (请勿在 destroy 方法中向 BeanFactory 请求获取 Bean 实例)
 					throw new BeanCreationNotAllowedException(beanName,
@@ -282,15 +293,25 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					// 创建共享的单实例 Bean
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
+
 				// 创建单例之前的回调, 默认实现将单例注册为当前正在创建中
 				beforeSingletonCreation(beanName);
+
+				// 表示生成了新单例对象的标记, 默认为 false, 表示没有生成新的单例对象
 				boolean newSingleton = false;
+				// 有抑制异常记录标记, 没有时为 true, 否则为 false
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
+
+				// 如果没有抑制异常记录
 				if (recordSuppressedExceptions) {
+					// 对抑制的异常列表进行实例化
 					this.suppressedExceptions = new LinkedHashSet<>();
 				}
 				try {
+					// 从单例工厂中获取对象, 调用在 AbstractBeanFactory 中传递进来的 ObjectFactory<T> 函数式接口
 					singletonObject = singletonFactory.getObject();
+
+					// 生成了新的单例对象标记为 true, 表示生成了新的单例对象
 					newSingleton = true;
 				}
 				catch (IllegalStateException ex) {

@@ -108,12 +108,26 @@ class BeanDefinitionValueResolver {
 	public Object resolveValueIfNecessary(Object argName, @Nullable Object value) {
 		// We must check each value to see whether it requires a runtime reference
 		// to another bean to be resolved.
+		// 我们必须检查每一个值, 以查看它是否需要对另一个 Bean 的运行时引用才能解决
+		// RuntimeBeanReference : 当属性值对象是工厂中另外一个 Bean 的引用时, 使用不可变的占位符类, 在运行时进行解析
+
+		// 如果 value 是 RuntimeBeanReference 实例
 		if (value instanceof RuntimeBeanReference) {
+			// 将 value 强制转换为 RuntimeBeanReference 对象
 			RuntimeBeanReference ref = (RuntimeBeanReference) value;
+			// 解析出对应 ref 所封装的 Bean 元信息(即 BeanName, Bean 类型)的 Bean 对象
 			return resolveReference(argName, ref);
 		}
+		// RuntimeBeanNameReference 对应于 -> <idref bean="kapcb" />
+		// idref 注入的目标是 bean 的 id 而不是目标 bean 实例, 同时使用 idref 容器在部署的时候还会验证这个名称的 bean
+		// 是否真是存在。其实 idref 就跟 value 一样, 只是将某个字符串注入到属性或者构造函数中, 只不过注入的是某个 bean 定义
+		// 的 id 属性值 :
+		// 即 : <idref bean="kapcb" /> 等同于 <value>kapcb</value>
+		// 如果 value 是 RuntimeBeanNameReference
 		else if (value instanceof RuntimeBeanNameReference) {
+			// 从 value 中获取引用的 beanName
 			String refName = ((RuntimeBeanNameReference) value).getBeanName();
+			// 对 refName 进行解析, 然后重新赋值给 refName
 			refName = String.valueOf(doEvaluate(refName));
 			if (!this.beanFactory.containsBean(refName)) {
 				throw new BeanDefinitionStoreException(
@@ -301,24 +315,34 @@ class BeanDefinitionValueResolver {
 	@Nullable
 	private Object resolveReference(Object argName, RuntimeBeanReference ref) {
 		try {
+			// 定义一个存储 Bean 对象的变量
 			Object bean;
+			// 获取另一个 Bean 引用的 Bean 的类型
 			Class<?> beanType = ref.getBeanType();
+			// 如果引用来自父工厂
 			if (ref.isToParent()) {
+				// 获取父工厂
 				BeanFactory parent = this.beanFactory.getParentBeanFactory();
+				// 如果没有父工厂
 				if (parent == null) {
+					// 抛出 BeanCreatingException : 无法解析对 bean 的引用, ref在父工厂中 : 没有可用的父工厂
 					throw new BeanCreationException(
 							this.beanDefinition.getResourceDescription(), this.beanName,
 							"Cannot resolve reference to bean " + ref +
 									" in parent factory: no parent factory available");
 				}
+				// 如果引用的 Bean 类型不为 null
 				if (beanType != null) {
+					// 从父工厂中获取引用的 Bean 类型对应的 Bean 实例对象
 					bean = parent.getBean(beanType);
 				}
 				else {
+					// 否则使用引用 Bean 的 BeanName, 从父工厂中获取对应的 Bean 实例对象
 					bean = parent.getBean(String.valueOf(doEvaluate(ref.getBeanName())));
 				}
 			}
 			else {
+				//
 				String resolvedName;
 				if (beanType != null) {
 					NamedBeanHolder<?> namedBean = this.beanFactory.resolveNamedBean(beanType);

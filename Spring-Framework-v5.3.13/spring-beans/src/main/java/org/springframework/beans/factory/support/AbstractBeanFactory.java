@@ -382,9 +382,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							// 显示地从单例缓存中删除实例 : 它可能是由创建过程急切地放在那里, 以允许循环依赖解。
 							// 还要移除接收到该 Bean 临时引用的任何 Bean
 							destroySingleton(beanName);
+							// 重新抛出异常
 							throw ex;
 						}
 					});
+					// 从 BeanInstance 中获取公开的 Bean 对象, 主要处理 BeanInstance 是 FactoryBean 的情况
+					// 如果不是 FactoryBean 会直接返回 beanInstance 实例
 					beanInstance = getObjectForBeanInstance(sharedInstance, name, beanName, mbd);
 				}
 
