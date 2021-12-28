@@ -486,22 +486,32 @@ class BeanDefinitionValueResolver {
 				}
 			}
 			else {
-				//
+				// 定义一个用于存放解析出来的 beanName 的变量
 				String resolvedName;
+				// 如果 beanType 不为空
 				if (beanType != null) {
+					// 解析于 beanName 匹配的唯一 Bean 实例, 包括其 BeanName
 					NamedBeanHolder<?> namedBean = this.beanFactory.resolveNamedBean(beanType);
+					// 让 bean 引用 namedBean 所封装的 Bean 对象
 					bean = namedBean.getBeanInstance();
+					// 让 resolvedName 引用 namedBean 所封装的 BeanName
 					resolvedName = namedBean.getBeanName();
 				}
 				else {
+					// 让 resolvedName 引用 ref 所包装的 Bean 名
 					resolvedName = String.valueOf(doEvaluate(ref.getBeanName()));
+					// 获取 resolvedName 的 Bean 实例对象
 					bean = this.beanFactory.getBean(resolvedName);
 				}
+				// 注册 beanName 与 dependentBeanNamed 的依赖关系到 Bean 工厂
 				this.beanFactory.registerDependentBean(resolvedName, this.beanName);
 			}
+			// 如果 Bean 是 NullBean 实例
 			if (bean instanceof NullBean) {
+				// 将 bean 置 null
 				bean = null;
 			}
+			// 返回解析出来的 bean
 			return bean;
 		}
 		catch (BeansException ex) {
