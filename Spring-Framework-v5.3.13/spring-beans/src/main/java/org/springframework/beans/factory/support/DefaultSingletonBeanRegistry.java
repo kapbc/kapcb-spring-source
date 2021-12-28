@@ -67,6 +67,13 @@ import org.springframework.util.StringUtils;
  * @see #registerDisposableBean
  * @see org.springframework.beans.factory.DisposableBean
  * @see org.springframework.beans.factory.config.ConfigurableBeanFactory
+ *
+ * 共享 Bean 实例的通用注册表, 实现了 SingletonBeanRegistry。允许注册表中注册的单例应该被所有调用者共享, 通过 beanName 名称获得。
+ *
+ * 支持等级的 DisposableBean 实例(这可能会或者不能正确的注册单例), 关闭注册表时 destroyed。
+ * 可以注册 bean 实例之间的依赖关系, 执行适当的关闭顺序。
+ *
+ * 这个类主要作用基类的 BeanFactory, 提供基本的管理 Singleton Bean 实例的功能
  */
 public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements SingletonBeanRegistry {
 
