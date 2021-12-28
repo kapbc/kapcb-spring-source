@@ -114,6 +114,8 @@ class BeanDefinitionValueResolver {
 	 * @param argName the name of the argument that the value is defined for
 	 * @param value the value object to resolve
 	 * @return the resolved object
+	 *
+	 * 给定一个 PropertyValue, 返回
 	 */
 	@Nullable
 	public Object resolveValueIfNecessary(Object argName, @Nullable Object value) {
@@ -121,6 +123,10 @@ class BeanDefinitionValueResolver {
 		// to another bean to be resolved.
 		// 我们必须检查每一个值, 以查看它是否需要对另一个 Bean 的运行时引用才能解决
 		// RuntimeBeanReference : 当属性值对象是工厂中另外一个 Bean 的引用时, 使用不可变的占位符类, 在运行时进行解析
+		// 在下面这种配置就会生成 RuntimeBeanReference :
+		// <bean class="com.kapcb.ccc.TestBean">
+		// 		<property name="referBeanName" ref="otherBeanName" />
+		// </bean>
 
 		// 如果 value 是 RuntimeBeanReference 实例
 		if (value instanceof RuntimeBeanReference) {
@@ -140,114 +146,241 @@ class BeanDefinitionValueResolver {
 			String refName = ((RuntimeBeanNameReference) value).getBeanName();
 			// 对 refName 进行解析, 然后重新赋值给 refName
 			refName = String.valueOf(doEvaluate(refName));
+			// 如果该 bean 工厂不包含具有 refName 的 BeanDefinition 或外部注册的 Singleton 实例
 			if (!this.beanFactory.containsBean(refName)) {
+				// 抛出 BeanDefinitionStoreException 异常 : argName 的 Bean 引用中的 Bean 名 'refName' 无效
 				throw new BeanDefinitionStoreException(
 						"Invalid bean name '" + refName + "' in bean reference for " + argName);
 			}
+			// 返回经过解析且经过检查其是否存在与 Bean 工厂的引用 BeanName[refName]
 			return refName;
 		}
+		// BeanDefinitionHolder : 据由名称和别名的 Bean 定义的持有者, 可以注册为内部 Bean 的占位符
+		// 如果出现 BeanDefinitionHolder 的情况, 一般是内部 Bean 配置
+		// 如果 value 是 BeanDefinitionHolder 实例
 		else if (value instanceof BeanDefinitionHolder) {
 			// Resolve BeanDefinitionHolder: contains BeanDefinition with name and aliases.
+			// 解决 BeanDefinitionHolder : 包含具有名称和别名的 BeanDefinition
+			// 将 value 强制转换为 BeanDefinitionHolder 对象
 			BeanDefinitionHolder bdHolder = (BeanDefinitionHolder) value;
+			// 根据 BeanDefinitionHolder 所封装的 BeanName 和 BeanDefinition 对象解析出内部 Bean 对象
 			return resolveInnerBean(argName, bdHolder.getBeanName(), bdHolder.getBeanDefinition());
 		}
+		// 一般在内部匿名 Bean 的配置才会出现 BeanDefinition, 如下 :
+		// <bean id="kapcb" class="com.kapcb.ccc.model.Person">
+		// 	 <property name="name" value="kapcb"/>
+		// 	 <property name="age" value="18"/>
+		//	 <property name="school">
+		//		 <bean class="com.kapcb.ccc.model.School">
+		//			 <property name="schoolName" value="PanLongErXiao"/>
+		//			 <property name="location" value="湖北省武汉市"/>
+		//		 </bean>
+		//	 </property>
+		// </bean>
+		// 如果 value 是 BeanDefinition 实例
 		else if (value instanceof BeanDefinition) {
 			// Resolve plain BeanDefinition, without contained name: use dummy name.
+			// 解析纯 BeanDefinition, 不包含名称 : 使用虚拟名称
+			// 将 value 强制类型转换为 BeanDefinition 对象
 			BeanDefinition bd = (BeanDefinition) value;
+			// 拼装内部 bean 名称 : "(inner bean)#" + BeanDefinition 的身份哈希码的十六进制字符串形式
 			String innerBeanName = "(inner bean)" + BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR +
 					ObjectUtils.getIdentityHexString(bd);
+			// 根据拼装的 innerBeanName 和 BeanDefinition 解析出内部 Bean 对象
 			return resolveInnerBean(argName, innerBeanName, bd);
 		}
+		// 如果 value 是 DependencyDescriptor 实例
 		else if (value instanceof DependencyDescriptor) {
+			// 定义一个用于存放找到的所有候选 BeanName 的集合, 初始化长度为4
 			Set<String> autowiredBeanNames = new LinkedHashSet<>(4);
+			// 根据 descriptor 的依赖类型解析出与 descriptor 所包装的对象匹配的候选 Bean 对象
 			Object result = this.beanFactory.resolveDependency(
 					(DependencyDescriptor) value, this.beanName, autowiredBeanNames, this.typeConverter);
+			// 遍历 autowiredBeanNames
 			for (String autowiredBeanName : autowiredBeanNames) {
+				// 如果该 BeanFactory 包含具有 autowiredBeanName 的 BeanDefinition 或外部注册的 Singleton 实例
 				if (this.beanFactory.containsBean(autowiredBeanName)) {
+					// 注册 autowiredBeanName 与 beanName 的依赖关系
 					this.beanFactory.registerDependentBean(autowiredBeanName, this.beanName);
 				}
 			}
+			// 返回与 descriptor 所包装的对象匹配的候选 Bean 对象
 			return result;
 		}
+
+		// 一般在 <array></array> 标签才会出现 ManagedArray, 如下 :
+		// <property name="girlFriends">
+		//	 <array>
+		//		 <value>girl friend one</value>
+		//		 <value>girl friend two</value>
+		//		 <value>girl friend three</value>
+		//		 <value>girl friend four</value>
+		//	 </array>
+		// </property>
+		// 如果 value 是 ManagedArray 实例
 		else if (value instanceof ManagedArray) {
 			// May need to resolve contained runtime references.
+			// 可能需要解析包含的运行时引用
+			// 将 value 类型强制转换为 ManagedArray 对象
 			ManagedArray array = (ManagedArray) value;
+			// 获取 array 的已解析元素类型
 			Class<?> elementType = array.resolvedElementType;
+			// 如果 elementType 为 null
 			if (elementType == null) {
+				// 获取 array 的元素类型名称, 指 array 标签的 value-type 属性
 				String elementTypeName = array.getElementTypeName();
+				// 如果 elementTypeName 不是空字符串
 				if (StringUtils.hasText(elementTypeName)) {
 					try {
+						// 使用 BeanFactory 工厂的 Bean 类型加载器加载 elementTypeName 对应的 class 对象
 						elementType = ClassUtils.forName(elementTypeName, this.beanFactory.getBeanClassLoader());
+						// 让 array#resolvedElementType 属性引用 elementType
 						array.resolvedElementType = elementType;
 					}
+					// 捕捉加载 elementTypeName 对应的 Class 对象的所有异常
 					catch (Throwable ex) {
 						// Improve the message by showing the context.
+						// 通过显示上下文来改善消息
+						// 抛出 BeanCreationException 异常 : 错误解析数组类型参数
 						throw new BeanCreationException(
 								this.beanDefinition.getResourceDescription(), this.beanName,
 								"Error resolving array type for " + argName, ex);
 					}
 				}
 				else {
+					// 让 elementTypeName 默认使用 Object 对象
 					elementType = Object.class;
 				}
 			}
+			// 解析 ManagedArray 对象, 以得到解析后的数组对象
 			return resolveManagedArray(argName, (List<?>) value, elementType);
 		}
+
+		// 一般在 <list></list> 标签才会出现 ManagedList :
+		// <property name="boyFriends">
+		//	 <list>
+		//		 <value>boy friend one</value>
+		//		 <value>boy friend two</value>
+		//		 <value>boy friend three</value>
+		//		 <value>boy friend four</value>
+		//	 </list>
+		// </property>
+		// 如果 value 是 ManagedList 实例
 		else if (value instanceof ManagedList) {
 			// May need to resolve contained runtime references.
+			// 可能需要解析包含的运行时引用
+			// 解析 ManagedList 对象, 以得到解析后的 List 对象并将结果返回出去
 			return resolveManagedList(argName, (List<?>) value);
 		}
+
+		// 一般在 <set></set> 标签才会出现 ManagedSet
+		// <property name="phoneNumbers">
+		//	 <set>
+		//		 <value>123456789</value>
+		//		 <value>987654321</value>
+		//		 <value>543216789</value>
+		//		 <value>666688888</value>
+		//	 </set>
+		// </property>
+		// 如果 value 是 ManagedSet 对象
 		else if (value instanceof ManagedSet) {
 			// May need to resolve contained runtime references.
+			// 可能需要解析包含的运行时引用
+			// 解析 ManagedSet 对象, 以得到解析后的 Set 对象并将结果返回出去
 			return resolveManagedSet(argName, (Set<?>) value);
 		}
+
+		// 一般在 <map></map> 标签才会出现 ManagedMap
+		// <property name="houses">
+		//	 <map>
+		//		 <entry key="one" value-ref="houseOne"/>
+		//		 <entry key="two" value-ref="houseTwo"/>
+		//	 </map>
+		// </property>
+		// 如果 value 是 ManagedMap 对象
 		else if (value instanceof ManagedMap) {
 			// May need to resolve contained runtime references.
+			// 可能需要解析包含的运行时引用
+			// 解析 ManagedMap 对象, 以得到解析后的 Map 对象并将结果返回出去
 			return resolveManagedMap(argName, (Map<?, ?>) value);
 		}
+
+		// 一般 <props></props> 标签才会出现 ManagedProperties
+		// <props>
+		//	<prop key="setA*">PROPAGATION_REQUIRED</prop>
+		//	<prop key="rollbackOnly">PROPAGATION_REQUIRED</prop>
+		//	<prop key="echoException">PROPAGATION_REQUIRED, +javax.servlet.ServletException, -java.lang.Exception</prop>
+		//	<prop key="setA*">PROPAGATION_REQUIRED</prop>
+		// <props>
+		// 如果 value 是 ManagedProperties 对象
 		else if (value instanceof ManagedProperties) {
+			// 将 value 强制类型转换为 Properties 对象
 			Properties original = (Properties) value;
+			// 定义一个用于存储 original 的所有 Property 的 键/值 解析后的 键/值 的 Properties 对象
 			Properties copy = new Properties();
+			// 遍历 original, 键名为 propKey, 值为 propValue
 			original.forEach((propKey, propValue) -> {
+				// 如果 proKey 是 TypedStringValue 实例
 				if (propKey instanceof TypedStringValue) {
+					// 在 propKey 封装的 value 可解析成表达式的情况下, 将 propKey 封装的 value 评估为表达式并解析出表达式的值
 					propKey = evaluate((TypedStringValue) propKey);
 				}
+				// 如果 propValue 是 TypedStringValue 实例
 				if (propValue instanceof TypedStringValue) {
+					// 在 propValue 封装的 value 可解析成表达式的情况下, 将 propValue 封装的 value 评估为表达式并解析出表达式的值
 					propValue = evaluate((TypedStringValue) propValue);
 				}
+				// 如果 propKey || propValue 为 null
 				if (propKey == null || propValue == null) {
+					// 抛出 BeanCreationException 异常 : 转换 argName 的属性 键/值 时出错 : 解析为 null
 					throw new BeanCreationException(
 							this.beanDefinition.getResourceDescription(), this.beanName,
 							"Error converting Properties key/value pair for " + argName + ": resolved to null");
 				}
+				// 将 propKey 和 propValue 添加到 copy 中
 				copy.put(propKey, propValue);
 			});
+			// 返回 copy
 			return copy;
 		}
+		// 如果 value 为 TypedStringValue 实例
 		else if (value instanceof TypedStringValue) {
 			// Convert value to target type here.
+			// 在此处将 value 转换为目标类型
+			// 将 value 强制转换为 TypedStringValue 对象
 			TypedStringValue typedStringValue = (TypedStringValue) value;
+			// 在 TypedStringValue 封装的 value 可解析成表达式的情况下, 将 TypedStringValue 封装的 value 评估为表达式并解析出表达式的值
 			Object valueObject = evaluate(typedStringValue);
 			try {
+				// 在 TypedStringValue 中解析目标类型
 				Class<?> resolvedTargetType = resolveTargetType(typedStringValue);
+				// 如果 resolvedTargetType 不为空
 				if (resolvedTargetType != null) {
+					// 使用 typeConverter 将值转换为所需的类型
 					return this.typeConverter.convertIfNecessary(valueObject, resolvedTargetType);
 				}
 				else {
+					// 返回解析出来表达式的值
 					return valueObject;
 				}
 			}
+			// 捕捉在解析目标类型或转换类型过程中抛出的异常
 			catch (Throwable ex) {
 				// Improve the message by showing the context.
+				// 通过显示上下文来改善消息
+				// 抛出 BeanCreationException 异常 : 为 argName 转换键入的字符串值时错误
 				throw new BeanCreationException(
 						this.beanDefinition.getResourceDescription(), this.beanName,
 						"Error converting typed String value for " + argName, ex);
 			}
 		}
+		// 如果 value 为 NullBean
 		else if (value instanceof NullBean) {
+			// 直接返回 null
 			return null;
 		}
 		else {
+			// 对于 value 是 String || String[] 类型会尝试评估为表达式并解析出表达式的值, 其它类型直接返回 value
 			return evaluate(value);
 		}
 	}
