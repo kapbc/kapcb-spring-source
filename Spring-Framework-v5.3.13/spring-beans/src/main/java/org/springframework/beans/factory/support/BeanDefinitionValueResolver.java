@@ -61,7 +61,7 @@ import org.springframework.util.StringUtils;
  * 在 Bean 工厂中实现中使用 Helper 类, 它将 BeanDefinition 对象中包含的值解析为应用于
  * 目标 Bean 实例的实际值
  *
- * 在 AbastractBeanFactory 和纯 BeanDefinition 对象上操作, 由 AbstractAutowireCapabaleBeanFactory
+ * 在 AbastractBeanFactory 和纯 BeanDefinition 对象上操作, 由 AbstractAutowireCapabaleBeanFactory 使用
  */
 class BeanDefinitionValueResolver {
 
@@ -80,10 +80,12 @@ class BeanDefinitionValueResolver {
 
 	/**
 	 * Create a BeanDefinitionValueResolver for the given BeanFactory and BeanDefinition.
-	 * @param beanFactory the BeanFactory to resolve against
-	 * @param beanName the name of the bean that we work on
-	 * @param beanDefinition the BeanDefinition of the bean that we work on
-	 * @param typeConverter the TypeConverter to use for resolving TypedStringValues
+	 * @param beanFactory the BeanFactory to resolve against -- 要解决的 BeanFactory, 即当前 BeanFactory
+	 * @param beanName the name of the bean that we work on -- 要使用的 BeanName
+	 * @param beanDefinition the BeanDefinition of the bean that we work on -- 要使用的 Bean 的 BeanDefinition
+	 * @param typeConverter the TypeConverter to use for resolving TypedStringValues -- 用于解析 TypeStringValues 的 TypeConverter
+	 *
+	 * 为给定的 BeanFactory 和 BeanDefinition 创建一个 BeanDefinitionValueResolver 实例
 	 */
 	public BeanDefinitionValueResolver(AbstractAutowireCapableBeanFactory beanFactory, String beanName,
 			BeanDefinition beanDefinition, TypeConverter typeConverter) {
