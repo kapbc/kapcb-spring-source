@@ -1073,12 +1073,21 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @return the object to expose as bean reference
 	 */
 	protected Object getEarlyBeanReference(String beanName, RootBeanDefinition mbd, Object bean) {
+		// 默认最终公开的对象是 bean, 通过 createBeanInstance 创建出来的普通对象
 		Object exposedObject = bean;
+		// RootBeanDefinition 的属性 synthetic, 设置此 BeanDefinition 是否为 synthetic, 一般是指只有 AOP 相关
+		// 或者 Advice 配置才将 synthetic 设置为 true
+		// 如果 RootBeanDefinition 不是 synthetic && 此工厂拥有 InstantiationAwareBeanPostProcessor
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
+			// 遍历工厂内的所有后置处理器
 			for (SmartInstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().smartInstantiationAware) {
+				// 让 exposedObject 经过每个 SmartInstantiationAwareBeanPostProcessor 的包装
+				// 这里可能会返回代理的 Bean 实例对象, 如果没有三级缓存, 那么将在整个容器中同时包含同名 Bean 的代理对象和非代理对象,
+				// 这与容器中都是单例对象相违背。如果容器中同时存在两个对象的话, 在从容器中 getBean 的时候无法判断需要获取的目标 Bean 是哪个
 				exposedObject = bp.getEarlyBeanReference(exposedObject, beanName);
 			}
 		}
+		// 返回最终经过层层包装后的对象
 		return exposedObject;
 	}
 
