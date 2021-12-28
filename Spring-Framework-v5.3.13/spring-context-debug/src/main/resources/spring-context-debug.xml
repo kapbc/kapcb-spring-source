@@ -8,8 +8,61 @@
 	   http://www.springframework.org/schema/context
 	   https://www.springframework.org/schema/context/spring-context.xsd">
 
-	<bean id="testBean" class="com.kapcb.ccc.components.TestBean">
+	<bean id="testBean" class="com.kapcb.ccc.model.TestBean">
 		<property name="username" value="Kapcb"/>
+	</bean>
+
+	<bean id="houseOne" class="com.kapcb.ccc.model.House">
+		<property name="location" value="深圳南山"/>
+		<property name="size" value="200"/>
+		<property name="price" value="20000000"/>
+	</bean>
+
+	<bean id="houseTwo" class="com.kapcb.ccc.model.House">
+		<property name="location" value="深圳福田"/>
+		<property name="size" value="180"/>
+		<property name="price" value="18000000"/>
+	</bean>
+
+	<bean id="kapcb" class="com.kapcb.ccc.model.Person">
+		<property name="name" value="kapcb"/>
+		<property name="age" value="18"/>
+		<property name="school">
+			<bean class="com.kapcb.ccc.model.School">
+				<property name="schoolName" value="PanLongErXiao"/>
+				<property name="location" value="湖北省武汉市"/>
+			</bean>
+		</property>
+		<property name="girlFriends">
+			<array>
+				<value>girl friend one</value>
+				<value>girl friend two</value>
+				<value>girl friend three</value>
+				<value>girl friend four</value>
+			</array>
+		</property>
+		<property name="boyFriends">
+			<list>
+				<value>boy friend one</value>
+				<value>boy friend two</value>
+				<value>boy friend three</value>
+				<value>boy friend four</value>
+			</list>
+		</property>
+		<property name="phoneNumbers">
+			<set>
+				<value>123456789</value>
+				<value>987654321</value>
+				<value>543216789</value>
+				<value>666688888</value>
+			</set>
+		</property>
+		<property name="houses">
+			<map>
+				<entry key="one" value-ref="houseOne"/>
+				<entry key="two" value-ref="houseTwo"/>
+			</map>
+		</property>
 	</bean>
 
 </beans>
