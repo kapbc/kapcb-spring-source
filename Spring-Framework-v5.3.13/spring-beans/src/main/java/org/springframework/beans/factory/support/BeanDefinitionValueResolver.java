@@ -57,15 +57,24 @@ import org.springframework.util.StringUtils;
  * @author Juergen Hoeller
  * @since 1.2
  * @see AbstractAutowireCapableBeanFactory
+ *
+ * 在 Bean 工厂中实现中使用 Helper 类, 它将 BeanDefinition 对象中包含的值解析为应用于
+ * 目标 Bean 实例的实际值
+ *
+ * 在 AbastractBeanFactory 和纯 BeanDefinition 对象上操作, 由 AbstractAutowireCapabaleBeanFactory
  */
 class BeanDefinitionValueResolver {
 
+	// 当前 Bean 工厂
 	private final AbstractAutowireCapableBeanFactory beanFactory;
 
+	// 要使用的 beanName
 	private final String beanName;
 
+	// beanName 对应的 BeanDefinition
 	private final BeanDefinition beanDefinition;
 
+	// 用于解析 TypeStringValues 的 TypeConverter
 	private final TypeConverter typeConverter;
 
 
