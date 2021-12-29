@@ -111,9 +111,9 @@ class BeanDefinitionValueResolver {
 	 * <li>A ManagedMap. In this case the value may be a RuntimeBeanReference
 	 * or Collection that will need to be resolved.
 	 * <li>An ordinary object or {@code null}, in which case it's left alone.
-	 * @param argName the name of the argument that the value is defined for
-	 * @param value the value object to resolve
-	 * @return the resolved object
+	 * @param argName the name of the argument that the value is defined for -- 为参数定义的参数名
+	 * @param value the value object to resolve -- 要解决的对象值
+	 * @return the resolved object -- 解析的对象
 	 *
 	 * 给定一个 PropertyValue, 返回一个值, 如果有必要, 解析对工厂中其它 Bean 的任何引用, 该值可以是 :
 	 * 1. BeanDefinition : 它会创建相应的新 Bean 实例。此类 '内部 Bean' 的单例标志和名称始终被忽略 : 内部 Bean 是匿名原型
