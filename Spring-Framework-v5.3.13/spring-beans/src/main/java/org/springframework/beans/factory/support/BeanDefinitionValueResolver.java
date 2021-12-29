@@ -111,11 +111,17 @@ class BeanDefinitionValueResolver {
 	 * <li>A ManagedMap. In this case the value may be a RuntimeBeanReference
 	 * or Collection that will need to be resolved.
 	 * <li>An ordinary object or {@code null}, in which case it's left alone.
-	 * @param argName the name of the argument that the value is defined for
-	 * @param value the value object to resolve
-	 * @return the resolved object
+	 * @param argName the name of the argument that the value is defined for -- 为参数定义的参数名
+	 * @param value the value object to resolve -- 要解决的对象值
+	 * @return the resolved object -- 解析的对象
 	 *
-	 * 给定一个 PropertyValue, 返回
+	 * 给定一个 PropertyValue, 返回一个值, 如果有必要, 解析对工厂中其它 Bean 的任何引用, 该值可以是 :
+	 * 1. BeanDefinition : 它会创建相应的新 Bean 实例。此类 '内部 Bean' 的单例标志和名称始终被忽略 : 内部 Bean 是匿名原型
+	 * 2. RuntimeBeanReference : 运行时 Bean 的引用, 必须解决
+	 * 3. ManagedList : 这是一个特殊集合, 其中可能包含需要解决的 RuntimeBeanReferences 或 Collections
+	 * 4. ManagedSet : 可能包含需要解决的 RuntimeBeanReferences 或 Collections
+	 * 5. ManagedMap : 在这种情况下, 该值可能是需要解析的 RuntimeBeanReferences 或 Collections
+	 * 6. 普通对象或 null, 在这种情况下将其保留
 	 */
 	@Nullable
 	public Object resolveValueIfNecessary(Object argName, @Nullable Object value) {
