@@ -393,15 +393,23 @@ class BeanDefinitionValueResolver {
 
 	/**
 	 * Evaluate the given value as an expression, if necessary.
-	 * @param value the candidate value (may be an expression)
-	 * @return the resolved value
+	 * @param value the candidate value (may be an expression) -- 候选值(可以是表达式)
+	 * @return the resolved value -- 解析值
+	 *
+	 * 在 value 封装的 value 可解析为表达式的情况下, 将 value 封装的 value 评估为表达式并解析出表达式的值
+	 * 如果有必要(value 可解析成表达式的情况下), 将 value 封装的 value 评估为表达式
+	 * 如果 result 与 value 所封装的 value 不相等, 将 value 标记为动态, 即包含一个表达式, 因此不进行缓存
 	 */
 	@Nullable
 	protected Object evaluate(TypedStringValue value) {
+		// 如果又必要(value 可解析成表达式的情况下), 将 value 封装的 value 评估为表达式并解析出表达式的值
 		Object result = doEvaluate(value.getValue());
+		// 如果 result 与 value 所封装的 value 不相等
 		if (!ObjectUtils.nullSafeEquals(result, value.getValue())) {
+			// 将 value 标记为动态, 即包含一个表达式, 因此不进行缓存
 			value.setDynamic();
 		}
+		// 返回 result
 		return result;
 	}
 
@@ -412,24 +420,38 @@ class BeanDefinitionValueResolver {
 	 */
 	@Nullable
 	protected Object evaluate(@Nullable Object value) {
+		// 如果 value 是 String 类型实例
 		if (value instanceof String) {
+			// 如果有必要(value 可解析成表达式的情况下), 将 value 评估为表达式并解析出表达式的值并返回出去
 			return doEvaluate((String) value);
 		}
+		// 如果 value 是 String数组
 		else if (value instanceof String[]) {
+			// 将 value 强制类型转换为 String[]
 			String[] values = (String[]) value;
+			// 是否经过解析的标记, 默认为 false
 			boolean actuallyResolved = false;
+			// 定义用于存放解析的值的 Object 数组, 长度为 values 的长度
 			Object[] resolvedValues = new Object[values.length];
+			// 遍历 values
 			for (int i = 0; i < values.length; i++) {
+				// 获取第 i 个 values 的元素
 				String originalValue = values[i];
+				// 如果有必要(value 可解析成表达式的情况下), 将 originalValue 评估为表达式并解析出表达式的值
 				Object resolvedValue = doEvaluate(originalValue);
+				// 如果 resolvedValue 与 originalValue 不是同一个对象
 				if (resolvedValue != originalValue) {
+					// 经过解析标记为 true, 表示已经经过解析
 					actuallyResolved = true;
 				}
+				// 将 resolvedValue 赋值给第 i 个 resolvedValues 元素
 				resolvedValues[i] = resolvedValue;
 			}
+			// 如果已经解析过, 返回解析后的数组 resolvedValues, 否则返回 values
 			return (actuallyResolved ? resolvedValues : values);
 		}
 		else {
+			// 其它类型直接返回 value
 			return value;
 		}
 	}
