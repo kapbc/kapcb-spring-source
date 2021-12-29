@@ -235,6 +235,12 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		return null;
 	}
 
+	/**
+	 * 放到集合中, 然后判断要不要包装, 其实就是在循环依赖注入属性的时候如果有 AOP 代理的话, 也会进行代理, 然后返回
+	 * @param bean the raw bean instance
+	 * @param beanName the name of the bean
+	 * @return Wrapper Bean Object
+	 */
 	@Override
 	public Object getEarlyBeanReference(Object bean, String beanName) {
 		Object cacheKey = getCacheKey(bean.getClass(), beanName);
@@ -247,10 +253,12 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		Object cacheKey = getCacheKey(beanClass, beanName);
 
 		if (!StringUtils.hasLength(beanName) || !this.targetSourcedBeans.contains(beanName)) {
+			// 查询缓存, 查看是否有处理过了, 不管是不是需要通知增强的, 只要是处理过了就会放入缓存中
 			if (this.advisedBeans.containsKey(cacheKey)) {
 				return null;
 			}
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
+				// 要跳过的直接设置为 false
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
 				return null;
 			}
@@ -324,24 +332,36 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 * @return a proxy wrapping the bean, or the raw bean instance as-is
 	 */
 	protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) {
+		// 如果已经处理过则直接返回
 		if (StringUtils.hasLength(beanName) && this.targetSourcedBeans.contains(beanName)) {
 			return bean;
 		}
+		// 这里的 advisedBeans 中缓存了已经进行了代理的 Bean, 如果在缓存中存在可以直接返回
 		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
 			return bean;
 		}
+
+		// isInfrastructureClass() 方法用于判断当前 Bean 是否为 Spring 系统自带的 Bean, Spring 自带的 Bean 是不进行代理的,
+		// shouldSkip() 方法用于判断当前 Bean 是否应该被略过
 		if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
+			// 对当前 Bean 进行缓存
 			this.advisedBeans.put(cacheKey, Boolean.FALSE);
 			return bean;
 		}
 
 		// Create proxy if we have advice.
+		// 获取当前 Bean 的 Advices 和 Advisors
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
+		// 对当前 Bean 的代理状态进行缓存
 		if (specificInterceptors != DO_NOT_PROXY) {
+			// 对当前 Bean 的代理状态进行缓存
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
+			// 根据获取到的 Advices 和 Advisors 为当前 Bean 生成动态代理对象
 			Object proxy = createProxy(
 					bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
+			// 缓存生成的代理 Bean 类型
 			this.proxyTypes.put(cacheKey, proxy.getClass());
+			// 缓存生成的代理 Bean
 			return proxy;
 		}
 
