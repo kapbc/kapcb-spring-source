@@ -531,7 +531,7 @@ class BeanDefinitionValueResolver {
 				String resolvedName;
 				// 如果 beanType 不为空
 				if (beanType != null) {
-					// 解析于 beanName 匹配的唯一 Bean 实例, 包括其 BeanName
+					// 解析于 beanType 匹配的唯一 Bean 实例, 包括其 BeanName
 					NamedBeanHolder<?> namedBean = this.beanFactory.resolveNamedBean(beanType);
 					// 让 bean 引用 namedBean 所封装的 Bean 对象
 					bean = namedBean.getBeanInstance();
