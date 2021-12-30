@@ -491,6 +491,11 @@ class BeanDefinitionValueResolver {
 
 	/**
 	 * Resolve a reference to another bean in the factory.
+	 * @param argName 定义值的参数名
+	 * @param ref 封装着另一个 bean 的引用的 RuntimeBeanReference 对象
+	 * @return Object
+	 *
+	 * 在工厂中解决对另一个 bean 的引用
 	 */
 	@Nullable
 	private Object resolveReference(Object argName, RuntimeBeanReference ref) {
