@@ -471,16 +471,21 @@ class BeanDefinitionValueResolver {
 
 	/**
 	 * Resolve the target type in the given TypedStringValue.
-	 * @param value the TypedStringValue to resolve
-	 * @return the resolved target type (or {@code null} if none specified)
-	 * @throws ClassNotFoundException if the specified type cannot be resolved
+	 * @param value the TypedStringValue to resolve  -- 要解析的 TypeStringValue
+	 * @return the resolved target type (or {@code null} if none specified)  -- 解析的目标(如果未指定, 则为 null)
+	 * @throws ClassNotFoundException if the specified type cannot be resolved  -- 如果无法解析指定的类型
 	 * @see TypedStringValue#resolveTargetType
+	 *
+	 * 在给定的 TypeStringValue 中解析目标类型
 	 */
 	@Nullable
 	protected Class<?> resolveTargetType(TypedStringValue value) throws ClassNotFoundException {
+		// 如果 value 有携带目标类型
 		if (value.hasTargetType()) {
+			// 返回 value 的目标类型
 			return value.getTargetType();
 		}
+		// 从 value 中解析出目标类型
 		return value.resolveTargetType(this.beanFactory.getBeanClassLoader());
 	}
 
