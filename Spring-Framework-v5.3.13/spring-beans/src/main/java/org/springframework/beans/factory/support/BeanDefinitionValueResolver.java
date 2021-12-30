@@ -555,7 +555,9 @@ class BeanDefinitionValueResolver {
 			// 返回解析出来的 bean
 			return bean;
 		}
+		// 捕捉 Bean 包和子包中引发的所有异常
 		catch (BeansException ex) {
+			// 抛出 BeanCreationException, 包装 ex : 设置 argName 时无法解析对 bean 'ref.getBeanName()' 的引用
 			throw new BeanCreationException(
 					this.beanDefinition.getResourceDescription(), this.beanName,
 					"Cannot resolve reference to bean '" + ref.getBeanName() + "' while setting " + argName, ex);
