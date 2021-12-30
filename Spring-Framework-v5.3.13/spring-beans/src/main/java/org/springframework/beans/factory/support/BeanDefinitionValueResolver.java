@@ -458,11 +458,14 @@ class BeanDefinitionValueResolver {
 
 	/**
 	 * Evaluate the given String value as an expression, if necessary.
-	 * @param value the original value (may be an expression)
-	 * @return the resolved value if necessary, or the original String value
+	 * @param value the original value (may be an expression)  -- 原始值(可能是一个表达式)
+	 * @return the resolved value if necessary, or the original String value -- 必要时解析的值或原始 String 值
+	 *
+	 * 如果有必要(value 可解析成表达式的情况瞎), 将给定的 String 值评估为表达式并解析出表达式的值
 	 */
 	@Nullable
 	private Object doEvaluate(@Nullable String value) {
+		// 评估 value, 如果 value 是可解析表达式, 会对其进行解析, 否则直接返回 value
 		return this.beanFactory.evaluateBeanDefinitionString(value, this.beanDefinition);
 	}
 
