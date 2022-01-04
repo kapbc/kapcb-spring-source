@@ -132,10 +132,23 @@ import org.springframework.util.ReflectionUtils;
  * @see org.springframework.context.event.ApplicationEventMulticaster
  * @see org.springframework.context.ApplicationListener
  * @see org.springframework.context.MessageSource
+ *
+ * 1.实现 Closeble、AutoCloseble 接口
+ * Closeble : JDK 提供的基于流的关闭
+ * AutoCloseble : JDK7 提供, 支持 try() 自动关闭
+ *
+ * 2.实现 org.springframework.context.Lifecycle 接口
+ * Lifecycle : 提供 start()、stop()、isRunning()方法
+ *
+ * 3.实现 org.springframework.context.ApplicationEventPublisher 接口
+ * ApplicationEventPublisher : 事件发布体系
+ * SimpleApplicationEventMulticaster : 负责注册、删除、与发布事件, 类似于观察者模式。注册事件支持 BeanName, 所以在创建 SimpleApplicationEventMulticaster 的时候需要一个 BeanFactory
+ *
  */
 public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		implements ConfigurableApplicationContext {
 
+	// MessageSource 在此应用上下文中实例的名字, 如果没有对应实例, 消息解析功能会委托给其父应用上下文
 	/**
 	 * Name of the MessageSource bean in the factory.
 	 * If none is supplied, message resolution is delegated to the parent.
@@ -143,6 +156,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	public static final String MESSAGE_SOURCE_BEAN_NAME = "messageSource";
 
+	// LifecycleProcessor 类在此应用上下文中实例的名字。如果没有对应实例, 将会默认使用 DefaultLifecycleProcessor
 	/**
 	 * Name of the LifecycleProcessor bean in the factory.
 	 * If none is supplied, a DefaultLifecycleProcessor is used.
@@ -151,6 +165,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	public static final String LIFECYCLE_PROCESSOR_BEAN_NAME = "lifecycleProcessor";
 
+	// ApplicationEventMulticaster 类在此应用中所对应的实例名字。如果没有对应实例, 则默认使用 SimpleApplicationEventMulticaster
 	/**
 	 * Name of the ApplicationEventMulticaster bean in the factory.
 	 * If none is supplied, a default SimpleApplicationEventMulticaster is used.
@@ -170,6 +185,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	static {
 		// Eagerly load the ContextClosedEvent class to avoid weird classloader issues
 		// on application shutdown in WebLogic 8.1. (Reported by Dustin Woods.)
+		// 主动加载 ContextClosedEvent, 以避免在 WebLogic 8.1 中关闭应用时出现 ClassLoader 问题
 		ContextClosedEvent.class.getName();
 	}
 
@@ -177,50 +193,64 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/** Logger used by this class. Available to subclasses. */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	// 此实例对应的唯一 id, 名字 @hashcode 这种形式
 	/** Unique id for this context, if any. */
 	private String id = ObjectUtils.identityToString(this);
 
+	// 用户好友的名字, 用以展示, 默认和 id 一样
 	/** Display name. */
 	private String displayName = ObjectUtils.identityToString(this);
 
+	// 父应用上下文
 	/** Parent context. */
 	@Nullable
 	private ApplicationContext parent;
 
+	// 此应用上下文的环境变量实例
 	/** Environment used by this context. */
 	@Nullable
 	private ConfigurableEnvironment environment;
 
+	// 应用上下文在加载和刷新的时候需要使用到的 BeanFactoryPostProcessor
 	/** BeanFactoryPostProcessors to apply on refresh. */
 	private final List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<>();
 
+	// 应用程序启动的时间, 时间戳
 	/** System time in milliseconds when this context started. */
 	private long startupDate;
 
+	// 该应用是否处于激活状态的标识
 	/** Flag that indicates whether this context is currently active. */
 	private final AtomicBoolean active = new AtomicBoolean();
 
+	// 该应用是否处于关闭的标识
 	/** Flag that indicates whether this context has been closed already. */
 	private final AtomicBoolean closed = new AtomicBoolean();
 
+	// refresh 和 destroy 方法会 synchronize 到此对象上
 	/** Synchronization monitor for the "refresh" and "destroy". */
 	private final Object startupShutdownMonitor = new Object();
 
+	// 提供给 JVM 的钩子方法, 用以 JVM 在关闭时同时关闭应用上下文, 清理资源
 	/** Reference to the JVM shutdown hook, if registered. */
 	@Nullable
 	private Thread shutdownHook;
 
+	// 此应用上下文使用的资源解析器
 	/** ResourcePatternResolver used by this context. */
 	private ResourcePatternResolver resourcePatternResolver;
 
+	// 用以管理此应用上下文 Bean 生命周期的 lifecycle
 	/** LifecycleProcessor for managing the lifecycle of beans within this context. */
 	@Nullable
 	private LifecycleProcessor lifecycleProcessor;
 
+	// 用以处理此应用上下文的 MessageSource 实例
 	/** MessageSource we delegate our implementation of this interface to. */
 	@Nullable
 	private MessageSource messageSource;
 
+	// 用于事件发布的工具类
 	/** Helper class used in event publishing. */
 	@Nullable
 	private ApplicationEventMulticaster applicationEventMulticaster;
@@ -228,13 +258,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/** Application startup metrics. **/
 	private ApplicationStartup applicationStartup = ApplicationStartup.DEFAULT;
 
+	// 预留的 ApplicationListener
 	/** Statically specified listeners. */
 	private final Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<>();
-
+	
 	/** Local listeners registered before refresh. */
 	@Nullable
 	private Set<ApplicationListener<?>> earlyApplicationListeners;
 
+	// 已经发布过的应用上下文事件
 	/** ApplicationEvents published before the multicaster setup. */
 	@Nullable
 	private Set<ApplicationEvent> earlyApplicationEvents;
@@ -242,6 +274,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	/**
 	 * Create a new AbstractApplicationContext with no parent.
+	 * 
+	 * 默认构造方法, 使用 PathMatchingResourcePatternResolver 作为资源解析器
 	 */
 	public AbstractApplicationContext() {
 		this.resourcePatternResolver = getResourcePatternResolver();
@@ -250,12 +284,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/**
 	 * Create a new AbstractApplicationContext with the given parent context.
 	 * @param parent the parent context
+	 * 
+	 * 带有父上下文环境的构造方法                 
 	 */
 	public AbstractApplicationContext(@Nullable ApplicationContext parent) {
 		this();
 		setParent(parent);
 	}
-
 
 	//---------------------------------------------------------------------
 	// Implementation of ApplicationContext interface
@@ -1549,6 +1584,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * closed already
 	 * @see #refreshBeanFactory()
 	 * @see #closeBeanFactory()
+	 *
+	 * 获取当前上下文的 BeanFactory 对象
+	 * 子类必须在此返回其内部 Bean 工厂, 他们应该有效地实现查找, 以便可以重复调用它而不影响性能
+	 * 子类应在返回内部 Bean 工厂之前校验上下文是否仍处于活跃状态。一旦关闭上下文, 通常应将内部工厂视为不可用
+	 * 此引用程序上下文的内部 Bean 工厂(永远不为 null)
+	 * 如果上下文尚未拥有内部 Bean 工厂(通常是从未调用过 refresh())或者是上下文已经关闭
 	 */
 	@Override
 	public abstract ConfigurableListableBeanFactory getBeanFactory() throws IllegalStateException;
