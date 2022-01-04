@@ -666,12 +666,20 @@ class BeanDefinitionValueResolver {
 
 	/**
 	 * For each element in the managed array, resolve reference if necessary.
+	 *
+	 * 解析 ManagedArray 对象, 以得到解析后的数组对象
+	 * 创建一个用于存放解析后的实例对象的 elementType 类型长度为 ml 大小的数组[变量resolved]
+	 * 对于托管数组中的每个元素, 如果有必要, 请解析引用
 	 */
 	private Object resolveManagedArray(Object argName, List<?> ml, Class<?> elementType) {
+		// 创建一个用于存放解析后的实例对象的 elementType 类型长度为 ml 集合大小的数组
 		Object resolved = Array.newInstance(elementType, ml.size());
+		// 遍历 ml 集合
 		for (int i = 0; i < ml.size(); i++) {
+			// 获取第 i 个 ml 元素对象, 解析出该元素对象的实例对象然后设置到第 i 个 resolved 元素中
 			Array.set(resolved, i, resolveValueIfNecessary(new KeyedArgName(argName, i), ml.get(i)));
 		}
+		// 返回解析后的数组对象[resolved]
 		return resolved;
 	}
 
