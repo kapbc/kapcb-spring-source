@@ -685,12 +685,20 @@ class BeanDefinitionValueResolver {
 
 	/**
 	 * For each element in the managed list, resolve reference if necessary.
+	 *
+	 * 解析 ManagedArray 对象, 以得到解析后的 List 对象
+	 * 创建一个用于存放解析后的实例对象长度为 ml 大小的 ArrayList
+	 * 对于托管数组中的每个元素, 如果有必要, 请解析引用
 	 */
 	private List<?> resolveManagedList(Object argName, List<?> ml) {
+		// 定义一个用于存放解析后的实例对象的 ArrayList, 初始容量为 ml 大小
 		List<Object> resolved = new ArrayList<>(ml.size());
+		// 遍历 ml
 		for (int i = 0; i < ml.size(); i++) {
+			// 获取第 i 个 ml 元素对象, 解析出该元素对象的实例对象然后添加到 resolved 中
 			resolved.add(resolveValueIfNecessary(new KeyedArgName(argName, i), ml.get(i)));
 		}
+		// 返回 resolved
 		return resolved;
 	}
 
