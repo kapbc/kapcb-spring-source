@@ -733,25 +733,44 @@ class BeanDefinitionValueResolver {
 	 * 对于托管 Map 中的每个元素, 如果有必要, 请解析引用
 	 */
 	private Map<?, ?> resolveManagedMap(Object argName, Map<?, ?> mm) {
+		// 定义用于存储解析后的 key 实例对象和 value 实例对象的 LinkedHashMap, 长度为 mm 的大小
 		Map<Object, Object> resolved = CollectionUtils.newLinkedHashMap(mm.size());
+		// 遍历 mm
 		mm.forEach((key, value) -> {
+			// 解析 mm 的 key 的实例对象
 			Object resolvedKey = resolveValueIfNecessary(argName, key);
+			// 解析 mm 的 value 的实例对象
 			Object resolvedValue = resolveValueIfNecessary(new KeyedArgName(argName, key), value);
+			// 将解析出来的 key 和 value 对象添加到 resolved 中
 			resolved.put(resolvedKey, resolvedValue);
 		});
+		// 返回 resolved
 		return resolved;
 	}
 
 
 	/**
 	 * Holder class used for delayed toString building.
+	 *
+	 * 用于延迟 toString 构建的 Holder 类
 	 */
 	private static class KeyedArgName {
 
+		/**
+		 * 参数名
+		 */
 		private final Object argName;
 
+		/**
+		 * 键值
+		 */
 		private final Object key;
 
+		/**
+		 * 构造器
+		 * @param argName 参数名
+		 * @param key 键值
+		 */
 		public KeyedArgName(Object argName, Object key) {
 			this.argName = argName;
 			this.key = key;
