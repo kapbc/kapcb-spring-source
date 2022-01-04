@@ -565,45 +565,70 @@ class BeanDefinitionValueResolver {
 	}
 
 	/**
-	 * Resolve an inner bean definition.
-	 * @param argName the name of the argument that the inner bean is defined for
-	 * @param innerBeanName the name of the inner bean
-	 * @param innerBd the bean definition for the inner bean
-	 * @return the resolved inner bean instance
+	 * Resolve an inner bean definition.  --  解析内部 Bean 实例
+	 * @param argName the name of the argument that the inner bean is defined for  --  为其定义内部 Bean 的参数名, 即外层 Bean 的属性名
+	 * @param innerBeanName the name of the inner bean  --  内部 Bean 名称
+	 * @param innerBd the bean definition for the inner bean  --  内部 Bean 的 BeanDefinition
+	 * @return the resolved inner bean instance  --  解析的内部 Bean 实例
 	 */
 	@Nullable
 	private Object resolveInnerBean(Object argName, String innerBeanName, BeanDefinition innerBd) {
+		// 定义一个用于保存 Inner Bean 与 BeanDefinition 合并后的 BeanDefinition 对象的变量
 		RootBeanDefinition mbd = null;
 		try {
+			// 获取 Inner Bean 与 BeanDefinition 合并后的 BeanDefinition 对象
 			mbd = this.beanFactory.getMergedBeanDefinition(innerBeanName, innerBd, this.beanDefinition);
 			// Check given bean name whether it is unique. If not already unique,
 			// add counter - increasing the counter until the name is unique.
+			// 检查给定的 Bean 名称是否唯一。如果不是唯一的, 添加计数器 - 增加计数器, 直到名称唯一为止
+			// 解决内部 Bean 名称需要唯一的问题
+			// 定义实际的内部 Bean 名, 初始为 innerBeanName
 			String actualInnerBeanName = innerBeanName;
+			// 如果 RootBeanDefinition 配置为单例模式
 			if (mbd.isSingleton()) {
+				// 调整 innerBeanName, 直到该 BeanName 在工厂中唯一。最后将结果赋值给 actualInnerBeanName
 				actualInnerBeanName = adaptInnerBeanName(innerBeanName);
 			}
+			// 将 actualInnerBeanName 和 beanName 的包含关系注册到该工厂中
 			this.beanFactory.registerContainedBean(actualInnerBeanName, this.beanName);
 			// Guarantee initialization of beans that the inner bean depends on.
+			// 确保内部 Bean 依赖的 Bean 的初始化
+			// 获取 RootBeanDefinition 需要依赖的 BeanName
 			String[] dependsOn = mbd.getDependsOn();
+			// 如果有需要依赖的 Bean
 			if (dependsOn != null) {
+				// 遍历依赖的 BeanName
 				for (String dependsOnBean : dependsOn) {
+					// 注册 dependsOnBean 与 actualInnerBeanName 的依赖关系到该工厂中
 					this.beanFactory.registerDependentBean(dependsOnBean, actualInnerBeanName);
+					// 获取 dependsOnBean 的 Bean 对象(不引用, 只是为了让 dependsOnBean 多对应的 Bean 对象实例化)
 					this.beanFactory.getBean(dependsOnBean);
 				}
 			}
 			// Actually create the inner bean instance now...
+			// 实际创建内部 Bean 实例
 			Object innerBean = this.beanFactory.createBean(actualInnerBeanName, mbd, null);
+			//如果创建的内部 Bean 实例是 FactoryBean 实例
 			if (innerBean instanceof FactoryBean) {
+				// RootBeanDefinition 是否标记为 synthetic。一般是指只有 AOP 相关的 pointCut 配置或者 Advice 配置才会将 synthetic 设置为 true
 				boolean synthetic = mbd.isSynthetic();
+				// 从 BeanFactory 对象中获取管理的对象, 只有 RootBeanDefinition 没有标记为 synthetic 才会对其进行该工厂的后置处理
 				innerBean = this.beanFactory.getObjectFromFactoryBean(
 						(FactoryBean<?>) innerBean, actualInnerBeanName, !synthetic);
 			}
+			// 如果内部 Bean 实例是 NullBean
 			if (innerBean instanceof NullBean) {
+				// 将 innerBean 设置为 null
 				innerBean = null;
 			}
+			// 返回 actualInnerBeanName 的 Bean 对象 [innerBean]
 			return innerBean;
 		}
+		// 捕捉解析内部 Bean 对象创建过程中抛出的 Bean 包和子包引发的所有异常
 		catch (BeansException ex) {
+			// 抛出 Bean 创建异常, 引用 ex :
+			// 在 RootBeanDefinition 不为 null 且 RootBeanDefinition 类名不为 null 的情况下, 描述异常 : 无法创建类为[RootBeanDefinition 的 Bean 类型名]的内部 bean 'innerBeanName',
+			// 否则, 描述异常 : 设置 argName 时无法创建内部 bean 'innerBeanName'
 			throw new BeanCreationException(
 					this.beanDefinition.getResourceDescription(), this.beanName,
 					"Cannot create inner bean '" + innerBeanName + "' " +
