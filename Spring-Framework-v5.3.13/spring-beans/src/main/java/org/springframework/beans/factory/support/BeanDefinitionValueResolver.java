@@ -704,14 +704,24 @@ class BeanDefinitionValueResolver {
 
 	/**
 	 * For each element in the managed set, resolve reference if necessary.
+	 *
+	 * 解析 ManagedSet 对象, 以得到解析后的 Set 对象
+	 * 创建一个用于存放解析后的实例对象长度为 ml 大小的 LinkedHashSet
+	 * 对于托管数组中的每个元素, 如果有必要, 请解析引用
 	 */
 	private Set<?> resolveManagedSet(Object argName, Set<?> ms) {
+		// 定义一个用于存放解析后的实例对象的 LinkedHashSet, 初始容量为 ml 大小
 		Set<Object> resolved = new LinkedHashSet<>(ms.size());
+		// 定义一个遍历时的偏移量
 		int i = 0;
+		// 遍历 ms
 		for (Object m : ms) {
+			// 解析出该 m 的实例对象然后添加到 resolved 中
 			resolved.add(resolveValueIfNecessary(new KeyedArgName(argName, i), m));
+			// 偏移量 +1
 			i++;
 		}
+		// 返回 resolved
 		return resolved;
 	}
 
