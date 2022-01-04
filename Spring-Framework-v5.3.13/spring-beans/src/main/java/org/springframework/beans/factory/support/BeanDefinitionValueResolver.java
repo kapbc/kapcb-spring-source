@@ -688,7 +688,7 @@ class BeanDefinitionValueResolver {
 	 *
 	 * 解析 ManagedArray 对象, 以得到解析后的 List 对象
 	 * 创建一个用于存放解析后的实例对象长度为 ml 大小的 ArrayList
-	 * 对于托管数组中的每个元素, 如果有必要, 请解析引用
+	 * 对于托管 List 集合中的每个元素, 如果有必要, 请解析引用
 	 */
 	private List<?> resolveManagedList(Object argName, List<?> ml) {
 		// 定义一个用于存放解析后的实例对象的 ArrayList, 初始容量为 ml 大小
@@ -707,7 +707,7 @@ class BeanDefinitionValueResolver {
 	 *
 	 * 解析 ManagedSet 对象, 以得到解析后的 Set 对象
 	 * 创建一个用于存放解析后的实例对象长度为 ml 大小的 LinkedHashSet
-	 * 对于托管数组中的每个元素, 如果有必要, 请解析引用
+	 * 对于托管 Set 集合中的每个元素, 如果有必要, 请解析引用
 	 */
 	private Set<?> resolveManagedSet(Object argName, Set<?> ms) {
 		// 定义一个用于存放解析后的实例对象的 LinkedHashSet, 初始容量为 ml 大小
@@ -727,6 +727,10 @@ class BeanDefinitionValueResolver {
 
 	/**
 	 * For each element in the managed map, resolve reference if necessary.
+	 *
+	 * 解析 ManagedMap 对象, 以得到解析后的 Map 对象
+	 * 创建一个用于存放解析后的实例对象长度为 ml 大小的 LinkedHashMap
+	 * 对于托管 Map 中的每个元素, 如果有必要, 请解析引用
 	 */
 	private Map<?, ?> resolveManagedMap(Object argName, Map<?, ?> mm) {
 		Map<Object, Object> resolved = CollectionUtils.newLinkedHashMap(mm.size());
