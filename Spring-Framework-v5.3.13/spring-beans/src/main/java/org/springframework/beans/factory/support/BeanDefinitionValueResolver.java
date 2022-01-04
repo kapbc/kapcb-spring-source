@@ -458,31 +458,44 @@ class BeanDefinitionValueResolver {
 
 	/**
 	 * Evaluate the given String value as an expression, if necessary.
-	 * @param value the original value (may be an expression)
-	 * @return the resolved value if necessary, or the original String value
+	 * @param value the original value (may be an expression)  -- 原始值(可能是一个表达式)
+	 * @return the resolved value if necessary, or the original String value -- 必要时解析的值或原始 String 值
+	 *
+	 * 如果有必要(value 可解析成表达式的情况瞎), 将给定的 String 值评估为表达式并解析出表达式的值
 	 */
 	@Nullable
 	private Object doEvaluate(@Nullable String value) {
+		// 评估 value, 如果 value 是可解析表达式, 会对其进行解析, 否则直接返回 value
 		return this.beanFactory.evaluateBeanDefinitionString(value, this.beanDefinition);
 	}
 
 	/**
 	 * Resolve the target type in the given TypedStringValue.
-	 * @param value the TypedStringValue to resolve
-	 * @return the resolved target type (or {@code null} if none specified)
-	 * @throws ClassNotFoundException if the specified type cannot be resolved
+	 * @param value the TypedStringValue to resolve  -- 要解析的 TypeStringValue
+	 * @return the resolved target type (or {@code null} if none specified)  -- 解析的目标(如果未指定, 则为 null)
+	 * @throws ClassNotFoundException if the specified type cannot be resolved  -- 如果无法解析指定的类型
 	 * @see TypedStringValue#resolveTargetType
+	 *
+	 * 在给定的 TypeStringValue 中解析目标类型
 	 */
 	@Nullable
 	protected Class<?> resolveTargetType(TypedStringValue value) throws ClassNotFoundException {
+		// 如果 value 有携带目标类型
 		if (value.hasTargetType()) {
+			// 返回 value 的目标类型
 			return value.getTargetType();
 		}
+		// 从 value 中解析出目标类型
 		return value.resolveTargetType(this.beanFactory.getBeanClassLoader());
 	}
 
 	/**
 	 * Resolve a reference to another bean in the factory.
+	 * @param argName 定义值的参数名
+	 * @param ref 封装着另一个 bean 的引用的 RuntimeBeanReference 对象
+	 * @return Object
+	 *
+	 * 在工厂中解决对另一个 bean 的引用
 	 */
 	@Nullable
 	private Object resolveReference(Object argName, RuntimeBeanReference ref) {
@@ -518,7 +531,7 @@ class BeanDefinitionValueResolver {
 				String resolvedName;
 				// 如果 beanType 不为空
 				if (beanType != null) {
-					// 解析于 beanName 匹配的唯一 Bean 实例, 包括其 BeanName
+					// 解析于 beanType 匹配的唯一 Bean 实例, 包括其 BeanName
 					NamedBeanHolder<?> namedBean = this.beanFactory.resolveNamedBean(beanType);
 					// 让 bean 引用 namedBean 所封装的 Bean 对象
 					bean = namedBean.getBeanInstance();
@@ -542,7 +555,9 @@ class BeanDefinitionValueResolver {
 			// 返回解析出来的 bean
 			return bean;
 		}
+		// 捕捉 Bean 包和子包中引发的所有异常
 		catch (BeansException ex) {
+			// 抛出 BeanCreationException, 包装 ex : 设置 argName 时无法解析对 bean 'ref.getBeanName()' 的引用
 			throw new BeanCreationException(
 					this.beanDefinition.getResourceDescription(), this.beanName,
 					"Cannot resolve reference to bean '" + ref.getBeanName() + "' while setting " + argName, ex);
