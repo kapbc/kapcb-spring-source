@@ -1549,6 +1549,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * closed already
 	 * @see #refreshBeanFactory()
 	 * @see #closeBeanFactory()
+	 *
+	 * 获取当前上下文的 BeanFactory 对象
+	 * 子类必须在此返回其内部 Bean 工厂, 他们应该有效地实现查找, 以便可以重复调用它而不影响性能
+	 * 子类应在返回内部 Bean 工厂之前校验上下文是否仍处于活跃状态。一旦关闭上下文, 通常应将内部工厂视为不可用
+	 * 此引用程序上下文的内部 Bean 工厂(永远不为 null)
+	 * 如果上下文尚未拥有内部 Bean 工厂(通常是从未调用过 refresh())或者是上下文已经关闭
 	 */
 	@Override
 	public abstract ConfigurableListableBeanFactory getBeanFactory() throws IllegalStateException;
