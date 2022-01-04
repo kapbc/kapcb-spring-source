@@ -688,7 +688,7 @@ class BeanDefinitionValueResolver {
 	 *
 	 * 解析 ManagedArray 对象, 以得到解析后的 List 对象
 	 * 创建一个用于存放解析后的实例对象长度为 ml 大小的 ArrayList
-	 * 对于托管数组中的每个元素, 如果有必要, 请解析引用
+	 * 对于托管 List 集合中的每个元素, 如果有必要, 请解析引用
 	 */
 	private List<?> resolveManagedList(Object argName, List<?> ml) {
 		// 定义一个用于存放解析后的实例对象的 ArrayList, 初始容量为 ml 大小
@@ -706,8 +706,8 @@ class BeanDefinitionValueResolver {
 	 * For each element in the managed set, resolve reference if necessary.
 	 *
 	 * 解析 ManagedSet 对象, 以得到解析后的 Set 对象
-	 * 创建一个用于存放解析后的实例对象长度为 ml 大小的 LinkedHashSet
-	 * 对于托管数组中的每个元素, 如果有必要, 请解析引用
+	 * 创建一个用于存放解析后的实例对象长度为 ms 大小的 LinkedHashSet
+	 * 对于托管 Set 集合中的每个元素, 如果有必要, 请解析引用
 	 */
 	private Set<?> resolveManagedSet(Object argName, Set<?> ms) {
 		// 定义一个用于存放解析后的实例对象的 LinkedHashSet, 初始容量为 ml 大小
@@ -727,27 +727,50 @@ class BeanDefinitionValueResolver {
 
 	/**
 	 * For each element in the managed map, resolve reference if necessary.
+	 *
+	 * 解析 ManagedMap 对象, 以得到解析后的 Map 对象
+	 * 创建一个用于存放解析后的实例对象长度为 mm 大小的 LinkedHashMap
+	 * 对于托管 Map 中的每个元素, 如果有必要, 请解析引用
 	 */
 	private Map<?, ?> resolveManagedMap(Object argName, Map<?, ?> mm) {
+		// 定义用于存储解析后的 key 实例对象和 value 实例对象的 LinkedHashMap, 长度为 mm 的大小
 		Map<Object, Object> resolved = CollectionUtils.newLinkedHashMap(mm.size());
+		// 遍历 mm
 		mm.forEach((key, value) -> {
+			// 解析 mm 的 key 的实例对象
 			Object resolvedKey = resolveValueIfNecessary(argName, key);
+			// 解析 mm 的 value 的实例对象
 			Object resolvedValue = resolveValueIfNecessary(new KeyedArgName(argName, key), value);
+			// 将解析出来的 key 和 value 对象添加到 resolved 中
 			resolved.put(resolvedKey, resolvedValue);
 		});
+		// 返回 resolved
 		return resolved;
 	}
 
 
 	/**
 	 * Holder class used for delayed toString building.
+	 *
+	 * 用于延迟 toString 构建的 Holder 类
 	 */
 	private static class KeyedArgName {
 
+		/**
+		 * 参数名
+		 */
 		private final Object argName;
 
+		/**
+		 * 键值
+		 */
 		private final Object key;
 
+		/**
+		 * 构造器
+		 * @param argName 参数名
+		 * @param key 键值
+		 */
 		public KeyedArgName(Object argName, Object key) {
 			this.argName = argName;
 			this.key = key;
