@@ -640,17 +640,27 @@ class BeanDefinitionValueResolver {
 	/**
 	 * Checks the given bean name whether it is unique. If not already unique,
 	 * a counter is added, increasing the counter until the name is unique.
-	 * @param innerBeanName the original name for the inner bean
-	 * @return the adapted name for the inner bean
+	 *
+	 * 检查给定的 BeanName 是否唯一, 如果还不是唯一的, 则添加计数器, 直到 BeanName 唯一为止
+	 * @param innerBeanName the original name for the inner bean  --  内部 Bean 的原始名称
+	 * @return the adapted name for the inner bean  --  内部 Bean 的调整后的最终 BeanName
 	 */
 	private String adaptInnerBeanName(String innerBeanName) {
+		// 定义一个实际内部 BeanName 变量, 初始为 innerBeanName
 		String actualInnerBeanName = innerBeanName;
+		// 定义一个用于计数的计数器, 初始为 0
 		int counter = 0;
+		// 只要 actualInnerBeanName 对应的 BeanName 已经在该工厂中使用(即 BeanName 已经有其它 Bean 在使用),
 		String prefix = innerBeanName + BeanFactoryUtils.GENERATED_BEAN_NAME_SEPARATOR;
+		// 该工厂是否已包含 actualInnerBeanName 对应的 Bean 实例对象或者该工厂是否已经为 actualInnerBeanName 注册了依赖 Bean 的关系 --> 就是当前 innerBeanName 是否已经被其它 Bean 实例注册了
+		// 如果当前 actualInnerBeanName 已经被其它 Bean 注册了, 则一直执行循环直到 actualInnerBeanName 在该工厂中唯一
 		while (this.beanFactory.isBeanNameInUse(actualInnerBeanName)) {
+			// 计数器 +1
 			counter++;
+			// 让 actualInnerBeanName 重新引用拼接后的字符串 : innerBeanName + '#' + counter
 			actualInnerBeanName = prefix + counter;
 		}
+		// 返回经过调整后的内部 Bean 实例的 BeanName
 		return actualInnerBeanName;
 	}
 
