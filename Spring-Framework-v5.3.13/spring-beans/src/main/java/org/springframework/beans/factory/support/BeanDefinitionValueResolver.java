@@ -706,7 +706,7 @@ class BeanDefinitionValueResolver {
 	 * For each element in the managed set, resolve reference if necessary.
 	 *
 	 * 解析 ManagedSet 对象, 以得到解析后的 Set 对象
-	 * 创建一个用于存放解析后的实例对象长度为 ml 大小的 LinkedHashSet
+	 * 创建一个用于存放解析后的实例对象长度为 ms 大小的 LinkedHashSet
 	 * 对于托管 Set 集合中的每个元素, 如果有必要, 请解析引用
 	 */
 	private Set<?> resolveManagedSet(Object argName, Set<?> ms) {
@@ -729,7 +729,7 @@ class BeanDefinitionValueResolver {
 	 * For each element in the managed map, resolve reference if necessary.
 	 *
 	 * 解析 ManagedMap 对象, 以得到解析后的 Map 对象
-	 * 创建一个用于存放解析后的实例对象长度为 ml 大小的 LinkedHashMap
+	 * 创建一个用于存放解析后的实例对象长度为 mm 大小的 LinkedHashMap
 	 * 对于托管 Map 中的每个元素, 如果有必要, 请解析引用
 	 */
 	private Map<?, ?> resolveManagedMap(Object argName, Map<?, ?> mm) {
