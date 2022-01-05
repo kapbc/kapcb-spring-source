@@ -301,6 +301,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * <p>Default is the object id of the context instance, or the name
 	 * of the context bean if the context is itself defined as a bean.
 	 * @param id the unique id of the context
+	 *
+	 * 此对应上下文的唯一 id
+	 * 对应的变量有默认值, 见声明
 	 */
 	@Override
 	public void setId(String id) {
@@ -321,6 +324,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * Set a friendly name for this context.
 	 * Typically done during initialization of concrete context implementations.
 	 * <p>Default is the object id of the context instance.
+	 *
+	 * 设置一个更友好的上下文名称, 通常在初始化应用上下文期间调用
 	 */
 	public void setDisplayName(String displayName) {
 		Assert.hasLength(displayName, "Display name must not be empty");
