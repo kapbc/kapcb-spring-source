@@ -254,20 +254,28 @@ public class SpringApplication {
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
+		// 设置配置源, 可以是多个, 所以是个集合
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
+		// 推断 web 服务类型
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
-		this.bootstrapRegistryInitializers = new ArrayList<>(
-				getSpringFactoriesInstances(BootstrapRegistryInitializer.class));
+		this.bootstrapRegistryInitializers = new ArrayList<>(getSpringFactoriesInstances(BootstrapRegistryInitializer.class));
+		// 工厂加载应用上下文初始化器, 利用 Spring 工厂加载机制, 实例化 ApplicationContextInitializer 实现类, 并排序对象集合
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
+		// 工厂加载应用上下文初始化监听器
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+		// 推断实际启动引导类
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 
 	private Class<?> deduceMainApplicationClass() {
 		try {
+			// 是获取所有线程
 			StackTraceElement[] stackTrace = new RuntimeException().getStackTrace();
+			// 遍历线程
 			for (StackTraceElement stackTraceElement : stackTrace) {
+				// 获取 main 线程
 				if ("main".equals(stackTraceElement.getMethodName())) {
+					// 取出 main 线程类名
 					return Class.forName(stackTraceElement.getClassName());
 				}
 			}
