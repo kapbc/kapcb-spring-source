@@ -267,6 +267,10 @@ public class SpringApplication {
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 
+	/**
+	 * 推断实际启动引导类
+	 * @return Class<?>
+	 */
 	private Class<?> deduceMainApplicationClass() {
 		try {
 			// 是获取所有线程
