@@ -435,9 +435,11 @@ public class SpringApplication {
 	}
 
 	private void refreshContext(ConfigurableApplicationContext context) {
+		// 是否注册 shutdown hook
 		if (this.registerShutdownHook) {
 			shutdownHook.registerApplicationContext(context);
 		}
+		// 容器刷新
 		refresh(context);
 	}
 
