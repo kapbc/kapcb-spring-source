@@ -297,27 +297,42 @@ public class SpringApplication {
 	 * @return a running {@link ApplicationContext}
 	 */
 	public ConfigurableApplicationContext run(String... args) {
+		// 启动计时器
 		long startTime = System.nanoTime();
 		DefaultBootstrapContext bootstrapContext = createBootstrapContext();
 		ConfigurableApplicationContext context = null;
+		// 该方法只做了一件事 : 设置了一个名为 java.awt.headless 的系统属性, 其实实现设置该应用程序即使没有检测到显示器, 也允许其启动
 		configureHeadlessProperty();
+		// 加载 SpringApplication 运行时监听器 SpringApplicationRunListeners
 		SpringApplicationRunListeners listeners = getRunListeners(args);
+		// 发布应用启动事件
 		listeners.starting(bootstrapContext, this.mainApplicationClass);
 		try {
+			// 初始化默认应用参数
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
+			// 根据运行监听器和应用参数来准备 Spring 环境
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
 			configureIgnoreBeanInfo(environment);
+			// 创建 Banner 打印类
 			Banner printedBanner = printBanner(environment);
+			// 创建 SpringApplication 应用上下文对象
 			context = createApplicationContext();
 			context.setApplicationStartup(this.applicationStartup);
+			// 准备应用上下文
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
+			// 容器刷新 AbstractApplicationContext#refresh()
 			refreshContext(context);
+			// 应用上下文刷新后置处理
 			afterRefresh(context, applicationArguments);
+			// 记录启动时间
 			Duration timeTakenToStartup = Duration.ofNanos(System.nanoTime() - startTime);
 			if (this.logStartupInfo) {
+				// 输出日志记录执行主类名, 时间信息
 				new StartupInfoLogger(this.mainApplicationClass).logStarted(getApplicationLog(), timeTakenToStartup);
 			}
+			// 发布应用上下文启动完成事件
 			listeners.started(context, timeTakenToStartup);
+			// 执行所有 Runner 运行器 (调用 ApplicationRunner)
 			callRunners(context, applicationArguments);
 		}
 		catch (Throwable ex) {
@@ -326,12 +341,14 @@ public class SpringApplication {
 		}
 		try {
 			Duration timeTakenToReady = Duration.ofNanos(System.nanoTime() - startTime);
+			// 发布应用上下文就绪事件
 			listeners.ready(context, timeTakenToReady);
 		}
 		catch (Throwable ex) {
 			handleRunFailure(context, ex, null);
 			throw new IllegalStateException(ex);
 		}
+		// 返回应用上下文
 		return context;
 	}
 
