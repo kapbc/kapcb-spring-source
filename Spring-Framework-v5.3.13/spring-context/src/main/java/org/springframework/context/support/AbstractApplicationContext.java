@@ -551,6 +551,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 	}
 
+	// 使用硬编码方式注入 BeanFactoryPostProcessor : 这种硬编码注入的 BeanFactoryPostProcessor 并不需要
+	// 也不支持接口排序。 而使用配置注入的方式因为 Spring 无法保证加载的顺序, 所以支持通过 PriorityOrdered、
+	// Ordered 排序接口的排序
 	@Override
 	public void addBeanFactoryPostProcessor(BeanFactoryPostProcessor postProcessor) {
 		Assert.notNull(postProcessor, "BeanFactoryPostProcessor must not be null");
