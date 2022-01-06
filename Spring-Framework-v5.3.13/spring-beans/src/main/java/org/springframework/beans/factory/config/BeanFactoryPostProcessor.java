@@ -82,14 +82,17 @@ public interface BeanFactoryPostProcessor {
 	 *
 	 * BeanDefinitionRegistryPostProcessor 和 BeanFactoryPostProcessor 的区别在于 :
 	 * 1、BeanDefinitionRegistryPostProcessor#postProcessBeanDefinitionRegistry 方法
-	 * 针对的是 BeanDefinitionRegistry 类型的 BeanFactory, 可以
-	 * 实现对 BeanDefinition 的增删改查操作, 但是对非 ConfigurableListableBeanFactory 类型
-	 * 的 BeanFactory 是不起作用的。
+	 * 针对的是当所有常规 BeanDefinition 加载完成之后, 可以再继续添加一些额外的 BeanDefinition。
 	 *
-	 * 2、BeanFactoryPostProcessor#postProcessBeanFactory 方法针对的是
-	 * ConfigurableListableBeanFactory 类型的 BeanFactory
+	 * 2、BeanFactoryPostProcessor#postProcessBeanFactory 方法针对的是所有的 BeanDefinition
+	 * 全部已经加载完毕, 然后可以对这些 BeanDefinition 做一些属性的修改或者添加工作。
 	 *
-	 * 3、postProcessBeanDefinitionRegistry 方法的调用时机在 postProcessBeanFactory 之前
+	 * 所以 Spring 官方建议的是 : BeanDefinitionRegistryPostProcessor 用来添加额外的BeanDefinition,
+	 * 而 BeanFactoryPostProcessor 用来修改已经加载完成的 BeanDefinition。
+	 *
+	 * BeanDefinitionRegistryPostProcessor 与 BeanFactoryPostProcess 的执行时机都是在 BeanDefinition
+	 * 开始加载之后, Bean 实例化之前。
+	 * postProcessBeanDefinitionRegistry 方法的调用时机在 postProcessBeanFactory 之前
 	 *
 	 * Modify the application context's internal bean factory after its standard
 	 * initialization. All bean definitions will have been loaded, but no beans
