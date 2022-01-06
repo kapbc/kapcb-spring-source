@@ -82,11 +82,12 @@ public interface BeanFactoryPostProcessor {
 	 *
 	 * BeanDefinitionRegistryPostProcessor 和 BeanFactoryPostProcessor 的区别在于 :
 	 * 1、BeanDefinitionRegistryPostProcessor#postProcessBeanDefinitionRegistry 方法
-	 * 针对的是 BeanDefinitionRegistry 类型的 ConfigurableListableBeanFactory, 可以
+	 * 针对的是 BeanDefinitionRegistry 类型的 BeanFactory, 可以
 	 * 实现对 BeanDefinition 的增删改查操作, 但是对非 ConfigurableListableBeanFactory 类型
 	 * 的 BeanFactory 是不起作用的。
 	 *
-	 * 2、BeanFactoryPostProcessor#postProcessBeanFactory 方法针对的是所有类型的 BeanFactory
+	 * 2、BeanFactoryPostProcessor#postProcessBeanFactory 方法针对的是
+	 * ConfigurableListableBeanFactory 类型的 BeanFactory
 	 *
 	 * 3、postProcessBeanDefinitionRegistry 方法的调用时机在 postProcessBeanFactory 之前
 	 *
