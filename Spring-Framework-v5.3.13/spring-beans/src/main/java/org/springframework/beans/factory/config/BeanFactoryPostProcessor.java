@@ -63,6 +63,33 @@ import org.springframework.beans.BeansException;
 public interface BeanFactoryPostProcessor {
 
 	/**
+	 * BeanFactoryPostProcessor 相较于 BeanPostProcessor 方法是很简单的, 只有一个方法
+	 * 其子接口 BeanDefinitionRegistryPostProcessor 也只有一个方法。但是它们的功能相似,
+	 * 区别在于作用域不同。
+	 *
+	 * BeanFactoryPostProcessor 作用域范围是容器级别的。它只与使用的容器相关。如果在容器中
+	 * 定义一个 Bean 的 BeanFactoryPostProcessor, 它仅仅只对此容器中的 Bean 进行后置增强
+	 * 处理
+	 *
+	 * BeanFactoryPostProcessor 不会对定义在另一个容器中的 Bean 进行后置增强处理, 即使这
+	 * 两个容器都在同一个容器中。
+	 *
+	 * BeanFactoryPostProcessor 可以对 Bean 的定义信息(配置元数据 BeanDefinition)进行
+	 * 处理。Spring IOC 容器允许 BeanFactoryPostProcessor 在容器实际实例化任何其他 Bean
+	 * 之前读取 Bean 的配置元数据, 并可以修改它。简而言之就是 BeanFactoryPostProcessor 接
+	 * 口是直接修改了 Bean 的定义信息, 而 BeanPostProcessor 则是对 Bean 创建过程中进行增强
+	 * 操作。
+	 *
+	 * BeanDefinitionRegistryPostProcessor 和 BeanFactoryPostProcessor 的区别在于 :
+	 * 1、BeanDefinitionRegistryPostProcessor#postProcessBeanDefinitionRegistry 方法
+	 * 针对的是 BeanDefinitionRegistry 类型的 ConfigurableListableBeanFactory, 可以
+	 * 实现对 BeanDefinition 的增删改查操作, 但是对非 ConfigurableListableBeanFactory 类型
+	 * 的 BeanFactory 是不起作用的。
+	 *
+	 * 2、BeanFactoryPostProcessor#postProcessBeanFactory 方法针对的是所有类型的 BeanFactory
+	 *
+	 * 3、postProcessBeanDefinitionRegistry 方法的调用时机在 postProcessBeanFactory 之前
+	 *
 	 * Modify the application context's internal bean factory after its standard
 	 * initialization. All bean definitions will have been loaded, but no beans
 	 * will have been instantiated yet. This allows for overriding or adding
