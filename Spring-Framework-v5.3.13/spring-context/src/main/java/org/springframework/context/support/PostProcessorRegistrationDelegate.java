@@ -55,6 +55,14 @@ final class PostProcessorRegistrationDelegate {
 	private PostProcessorRegistrationDelegate() {
 	}
 
+	/**
+	 * 对 BeanDefinitionRegistry 类型的 BeanFactory 的处理, 以及 BeanFactoryPostProcess
+	 * 调用顺序问题的处理
+	 *
+	 * @param beanFactory BeanFactory
+	 * @param beanFactoryPostProcessors 通过硬编码注册的 BeanFactoryPostProcess 类型的处理器
+	 * @see AbstractApplicationContext#getBeanFactoryPostProcessors()
+	 */
 	// 对于 BeanDefinitionRegistry 类型的 BeanFactory 的处理
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
@@ -80,7 +88,7 @@ final class PostProcessorRegistrationDelegate {
 		// 则交由 BeanDefinitionRegistryPostProcessor 处理, 否则直接按照 BeanFactoryPostProcessor 进行处理
 		// 由于 BeanDefinitionRegistryPostProcessor 只能处理 BeanDefinitionRegistry 的子类, 所以这里必须先进行 beanFactory 的区分
 		if (beanFactory instanceof BeanDefinitionRegistry) {
-			// 以下逻辑看似复杂其实大体就是两部
+			// 以下逻辑看似复杂其实大体就是两步
 			// 1.获取所有硬编码的 BeanDefinitionRegistryPostProcessor 类型, 激活 postProcessBeanDefinitionRegistry 方法
 			// 2.获取所有配置的 BeanDefinitionRegistryPostProcessor 类型, 激活 postProcessBeanDefinitionRegistry 方法
 
