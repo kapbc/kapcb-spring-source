@@ -319,6 +319,7 @@ public class SpringApplication {
 			context = createApplicationContext();
 			context.setApplicationStartup(this.applicationStartup);
 			// 准备应用上下文
+			
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
 			// 容器刷新 AbstractApplicationContext#refresh()
 			refreshContext(context);
