@@ -1385,6 +1385,7 @@ public class SpringApplication {
 		return exitCode;
 	}
 
+	// 容器关闭
 	private static void close(ApplicationContext context) {
 		if (context instanceof ConfigurableApplicationContext) {
 			ConfigurableApplicationContext closable = (ConfigurableApplicationContext) context;
