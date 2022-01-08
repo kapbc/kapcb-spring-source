@@ -631,7 +631,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
-				// 注册 BeanPostProcessor 处理器。这里只是单纯的注册功能, 真正调用的是 getBean 方法, BeanPostProcessor 在这一步已经完成了创建。
+				// 注册 BeanPostProcessor 处理器。这里只是单纯的注册功能, 真正调用的是 getBean 方法,
+				// BeanPostProcessor 在这一步已经通过 beanFactory.getBean() 方法完成了创建。
 				registerBeanPostProcessors(beanFactory);
 				beanPostProcess.end();
 
