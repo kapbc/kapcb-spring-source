@@ -168,11 +168,14 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 
 	@Override
 	public final ConfigurableListableBeanFactory getBeanFactory() {
+		// 获取当前对象中的 BeanFactory
 		DefaultListableBeanFactory beanFactory = this.beanFactory;
+		// 返回 BeanFactory 之前必须校验上下文是否仍处于活跃状态, 如果此时 BeanFactory 为空, 则抛出异常
 		if (beanFactory == null) {
 			throw new IllegalStateException("BeanFactory not initialized or already closed - " +
 					"call 'refresh' before accessing beans via the ApplicationContext");
 		}
+		// 返回 BeanFactory
 		return beanFactory;
 	}
 
