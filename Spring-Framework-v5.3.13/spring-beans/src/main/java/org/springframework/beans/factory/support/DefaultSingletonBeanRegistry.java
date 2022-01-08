@@ -83,16 +83,19 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 	// 单例对象的一级缓存 key -> BeanName, value -> BeanInstance
 	// 此容器中保存的 BeanInstance 为完整 Bean 实例
+	// 单实例的 Bean 实例创建完成之后都会存放在 singletonObjects 容器中, 后续使用直接从 singletonObjects 容器中获取
 	/** Cache of singleton objects: bean name to bean instance. */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
-	// 单例对象的三级缓存 key -> BeanName, value -> ObjectFactory
+	// 单例对象的三级缓存 key -> BeanName, value -> ObjectFactory<?>
 	// 此时容器中保存的是实例化 Bean 的 ObjectFactory
+	// 用于解决循环依赖的 singletonFactories 容器, 保存 Bean 实例创建之前提前暴露的 Bean 实例对象
 	/** Cache of singleton factories: bean name to ObjectFactory. */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
 	// 单例对象的二级缓存 key -> BeanName, value -> BeanInstance
 	// 此时容器中保存的 BeanInstance 并非完整的 Bean 实例
+	// 用于解决循环依赖的 earlySingletonObjects 容器, 保存三级缓存中通过 ObjectFactory<?>#getObject() 创建的非完整实例对象
 	/** Cache of early singleton objects: bean name to bean instance. */
 	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
 
@@ -102,6 +105,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
 	// 保存当前正在创建的 Bean 实例的 BeanName, 用于解决循环依赖
+	// 当 Bean 实例正在创建时, 会将 BeanName 保存在这个容器中, Bean 实例创建完成之后会将 BeanName 从该容器中移除
 	/** Names of beans that are currently in creation. */
 	private final Set<String> singletonsCurrentlyInCreation = Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 
@@ -129,11 +133,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 	// 指定 Bean 与依赖指定 Bean 的所有 Bean 的依赖关系的缓存
 	// 即 : key -> BeanName, value -> 依赖 key 中 BeanName 的所有 BeanName 集合
+	// 保存 Bean 的依赖关系, 比如 A 对象依赖于 B 对象, 保存的 key 是 B 的 BeanName, 保存的 value 是 A 的 BeanName
 	/** Map between dependent bean names: bean name to Set of dependent bean names. */
 	private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<>(64);
 
 	// 指定 Bean 与创建这个 Bean 所需依赖的所有 Bean 的依赖关系的缓存
 	// 即 : key -> BeanName, value -> 被 key 中 BeanName 所依赖的 BeanName 集合
+	// 保存 Bean 的依赖关系, 比如 A 对象依赖于 B 对象, 保存的 key 是 A 的 BeanName, 保存的 value 是 B 的 BeanName, 与上面的 dependentBeanMap 相反
 	/** Map between depending bean names: bean name to Set of bean names for the bean's dependencies. */
 	private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<>(64);
 
