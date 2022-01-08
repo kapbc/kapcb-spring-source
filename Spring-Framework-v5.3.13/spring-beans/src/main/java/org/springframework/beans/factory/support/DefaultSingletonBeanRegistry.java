@@ -81,57 +81,59 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private static final int SUPPRESSED_EXCEPTIONS_LIMIT = 100;
 
 
-	// 单例对象的一级缓存 key -> beanName, value -> BeanInstance
+	// 单例对象的一级缓存 key -> BeanName, value -> BeanInstance
 	// 此容器中保存的 BeanInstance 为完整 Bean 实例
 	/** Cache of singleton objects: bean name to bean instance. */
 	private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>(256);
 
-	// 单例对象的三级缓存 key -> beanName, value -> ObjectFactory
+	// 单例对象的三级缓存 key -> BeanName, value -> ObjectFactory
 	// 此时容器中保存的是实例化 Bean 的 ObjectFactory
 	/** Cache of singleton factories: bean name to ObjectFactory. */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
-	// 单例对象的二级缓存 key -> beanName, value -> BeanInstance
+	// 单例对象的二级缓存 key -> BeanName, value -> BeanInstance
 	// 此时容器中保存的 BeanInstance 并非完整的 Bean 实例
 	/** Cache of early singleton objects: bean name to bean instance. */
 	private final Map<String, Object> earlySingletonObjects = new ConcurrentHashMap<>(16);
 
-	// 除了三级缓存以外, 还有一个 Set 集合用于保存已经创建成功(完全实例化)的 bean 的 beanName
-	// value -> beanName
+	// 除了三级缓存以外, 还有一个 Set 集合用于保存已经创建成功(完全实例化)的 Bean 的 BeanName
+	// value -> BeanName
 	/** Set of registered singletons, containing the bean names in registration order. */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
-	// 保存当前正在创建的 bean 实例的 beanName
+	// 保存当前正在创建的 Bean 实例的 BeanName, 用于解决循环依赖
 	/** Names of beans that are currently in creation. */
-	private final Set<String> singletonsCurrentlyInCreation =
-			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
+	private final Set<String> singletonsCurrentlyInCreation = Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 
+	// 用于保存当前从创建检查中排除的 BeanName
 	/** Names of beans currently excluded from in creation checks. */
-	private final Set<String> inCreationCheckExclusions =
-			Collections.newSetFromMap(new ConcurrentHashMap<>(16));
+	private final Set<String> inCreationCheckExclusions = Collections.newSetFromMap(new ConcurrentHashMap<>(16));
 
-	// 抑制的异常列表, 用于存放异常出现的相关原因容器, 可用于关联相关原因
+	// Bean 初始化过程中的抑制异常列表, 用于存放异常出现的相关原因容器, 可用于关联相关原因
 	/** Collection of suppressed Exceptions, available for associating related causes. */
 	@Nullable
 	private Set<Exception> suppressedExceptions;
 
-	// 指示当前 bean 对象是否在 destroySingletons(销毁单例) 中的标志
+	// 指示当前 Bean 对象是否在 destroySingletons(销毁单例) 中的标志
 	/** Flag that indicates whether we're currently within destroySingletons. */
 	private boolean singletonsCurrentlyInDestruction = false;
 
-	// 存放一次性 bean 实例的缓存
+	// 存放一次性 Bean 实例的缓存
 	/** Disposable bean instances: bean name to disposable instance. */
 	private final Map<String, Object> disposableBeans = new LinkedHashMap<>();
 
-	// 外部 bean 与被包含在外部 bean 的所有内部 bean 集合包含关系的缓存
+	// 外部 Bean 与被包含在外部 Bean 的所有内部 Bean 集合包含关系的缓存
+	// 即 : key -> BeanName, value -> 该 BeanName 所代表的 Bean 实例所包含的 BeanName 集合
 	/** Map between containing bean names: bean name to Set of bean names that the bean contains. */
 	private final Map<String, Set<String>> containedBeanMap = new ConcurrentHashMap<>(16);
 
-	// 指定 bean 与依赖指定 bean 的所有 bean 的依赖关系的缓存
+	// 指定 Bean 与依赖指定 Bean 的所有 Bean 的依赖关系的缓存
+	// 即 : key -> BeanName, value -> 依赖 key 中 BeanName 的所有 BeanName 集合
 	/** Map between dependent bean names: bean name to Set of dependent bean names. */
 	private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<>(64);
 
-	// 指定 bean 与创建这个 bean 所需依赖的所有 bean 的依赖关系的缓存
+	// 指定 Bean 与创建这个 Bean 所需依赖的所有 Bean 的依赖关系的缓存
+	// 即 : key -> BeanName, value -> 被 key 中 BeanName 所依赖的 BeanName 集合
 	/** Map between depending bean names: bean name to Set of bean names for the bean's dependencies. */
 	private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<>(64);
 
