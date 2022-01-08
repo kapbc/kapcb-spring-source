@@ -322,31 +322,47 @@ final class PostProcessorRegistrationDelegate {
 
 		// Separate between BeanPostProcessors that implement PriorityOrdered,
 		// Ordered, and the rest.
+		// 用于保存实现了 PriorityOrdered 排序接口的 BeanPostProcessor
 		List<BeanPostProcessor> priorityOrderedPostProcessors = new ArrayList<>();
+		// 用于保存 MergedBeanDefinitionPostProcessor 类型 BeanPostProcessor
 		List<BeanPostProcessor> internalPostProcessors = new ArrayList<>();
+		// 用于保存实现了 Ordered 排序接口的 BeanPostProcessor 的 BeanName
 		List<String> orderedPostProcessorNames = new ArrayList<>();
+		// 用于保存没有实现任何排序接口的 BeanPostProcessor 的 BeanName
 		List<String> nonOrderedPostProcessorNames = new ArrayList<>();
+		// 遍历所有的 BeanPostProcessor 的 BeanName, 按照不同筛选条件放入相应的容器中
 		for (String ppName : postProcessorNames) {
+			// 如果实现了 PriorityOrdered 排序接口
 			if (beanFactory.isTypeMatch(ppName, PriorityOrdered.class)) {
+				// 根据 BeanName 获取 Bean 实例并放入 priorityOrderedPostProcessors 中
 				BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
 				priorityOrderedPostProcessors.add(pp);
+				// 如果是 MergedBeanDefinitionPostProcessor 类型的 BeanPostProcessor 继续放入 internalPostProcessors 中
 				if (pp instanceof MergedBeanDefinitionPostProcessor) {
 					internalPostProcessors.add(pp);
 				}
 			}
+			// 如果实现了 Ordered 排序接口
 			else if (beanFactory.isTypeMatch(ppName, Ordered.class)) {
+				// 将 BeanName 放入 orderedPostProcessorNames 中
 				orderedPostProcessorNames.add(ppName);
 			}
+			// 没有实现任何排序接口
 			else {
+				// 将 BeanName 放入 nonOrderedPostProcessorNames 中
 				nonOrderedPostProcessorNames.add(ppName);
 			}
 		}
 
 		// First, register the BeanPostProcessors that implement PriorityOrdered.
+		// 对实现了 PriorityOrdered 排序接口的 BeanPostProcessor 进行排序
 		sortPostProcessors(priorityOrderedPostProcessors, beanFactory);
+		// 根据排序结果依次注册 BeanPostProcessor 到 BeanFactory 中,
+		// 实际就是将排序后的 BeanPostProcessor 保存到 AbstractBeanFactory#beanPostProcessors 容器中
 		registerBeanPostProcessors(beanFactory, priorityOrderedPostProcessors);
 
 		// Next, register the BeanPostProcessors that implement Ordered.
+		//
 		List<BeanPostProcessor> orderedPostProcessors = new ArrayList<>(orderedPostProcessorNames.size());
 		for (String ppName : orderedPostProcessorNames) {
 			BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
@@ -430,12 +446,15 @@ final class PostProcessorRegistrationDelegate {
 	 */
 	private static void registerBeanPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanPostProcessor> postProcessors) {
-
+		// 如果是 AbstractBeanFactory 类型的 BeanFactory
 		if (beanFactory instanceof AbstractBeanFactory) {
 			// Bulk addition is more efficient against our CopyOnWriteArrayList there
+			// 将其放入 AbstractBeanFactory 的 beanPostProcessors 容器中
 			((AbstractBeanFactory) beanFactory).addBeanPostProcessors(postProcessors);
 		}
+		// 如果是非 AbstractBeanFactory 类型的 BeanFactory
 		else {
+			// 依次遍历放入 BeanFactory 的 addBeanPostProcessor 容器中
 			for (BeanPostProcessor postProcessor : postProcessors) {
 				beanFactory.addBeanPostProcessor(postProcessor);
 			}
