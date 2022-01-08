@@ -1,7 +1,7 @@
 package com.kapcb.ccc;
 
 import com.kapcb.ccc.model.TestBean;
-import org.springframework.beans.factory.BeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -32,9 +32,9 @@ public class MainApplication {
 	 */
 	public static void main(String[] args) {
 		// 指定配置文件获取 Spring Application Context 容器
-		BeanFactory beanFactory = new ClassPathXmlApplicationContext("spring-context-debug.xml");
+		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring-context-debug.xml");
 		// 从 IOC 容器中获取注册的 Bean 实例对象
-		TestBean testBean = beanFactory.getBean("testBean", TestBean.class);
+		TestBean testBean = applicationContext.getBean("testBean", TestBean.class);
 		// 调用方法
 		testBean.say();
 	}

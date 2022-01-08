@@ -2,7 +2,7 @@ package com.kapcb.ccc;
 
 import com.kapcb.ccc.configuration.AnnotationTestConfiguration;
 import com.kapcb.ccc.model.DebugBean;
-import org.springframework.beans.factory.BeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
@@ -16,8 +16,10 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 public class AnnotationApplication {
 
 	public static void main(String[] args) {
-		BeanFactory beanFactory = new AnnotationConfigApplicationContext(AnnotationTestConfiguration.class);
-		DebugBean testBean = beanFactory.getBean("testBean", DebugBean.class);
+
+		ApplicationContext applicationContext = new AnnotationConfigApplicationContext(AnnotationTestConfiguration.class);
+		DebugBean testBean = applicationContext.getBean("testBean", DebugBean.class);
 		testBean.say();
+
 	}
 }
