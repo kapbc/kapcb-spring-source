@@ -1571,6 +1571,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	//---------------------------------------------------------------------
 
 	/**
+	 * 将 BeanFactory 的创建委派给 refreshBeanFactory() 由子类继承并重写该方法去实现 BeanFactory
+	 * 的创建, 自己并不关心创建过程
+	 *
 	 * Subclasses must implement this method to perform the actual configuration load.
 	 * The method is invoked by {@link #refresh()} before any other initialization work.
 	 * <p>A subclass will either create a new bean factory and hold a reference to it,
