@@ -79,15 +79,25 @@ public abstract class BeanFactoryUtils {
 	 * @see BeanFactory#FACTORY_BEAN_PREFIX
 	 */
 	public static String transformedBeanName(String name) {
+		// 判空
 		Assert.notNull(name, "'name' must not be null");
+		// 如果 BeanName 不是以 '&' 开头, 则直接原样返回
 		if (!name.startsWith(BeanFactory.FACTORY_BEAN_PREFIX)) {
 			return name;
 		}
+		// 如果 transformedBeanNameCache 没有 BeanName 处理过后最终的 BeanName 就将
+		// BeanName 处理完之后放入 transformedBeanNameCache 中并返回处理过后的 BeanName,
+		// 如果 transformedBeanNameCache 中包含 BeanName 处理后的 BeanName 则直接从
+		// transformedBeanNameCache 中取出返回
 		return transformedBeanNameCache.computeIfAbsent(name, beanName -> {
+			// 否则剪切到开头的 '&', 直到 BeanName 中没有 '&'
 			do {
+				// 将 BeanName 剪切到开头的 '&'
 				beanName = beanName.substring(BeanFactory.FACTORY_BEAN_PREFIX.length());
 			}
+			// 直到 BeanName 中没有 '&'
 			while (beanName.startsWith(BeanFactory.FACTORY_BEAN_PREFIX));
+			// 返回处理完成之后的 BeanName
 			return beanName;
 		});
 	}
