@@ -205,17 +205,19 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 	@Override
 	public Object getBean(String name) throws BeansException {
-		// 实际获取 Bean 的方法, 也是触发依赖注入的方法
+		// 实际获取 Bean 实例的方法, 也是触发依赖注入的方法
 		return doGetBean(name, null, null, false);
 	}
 
 	@Override
 	public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
+		// 实际获取 Bean 实例的方法, 也是触发依赖注入的方法
 		return doGetBean(name, requiredType, null, false);
 	}
 
 	@Override
 	public Object getBean(String name, Object... args) throws BeansException {
+		// 实际获取 Bean 实例的方法, 也是触发依赖注入的方法
 		return doGetBean(name, null, args, false);
 	}
 
