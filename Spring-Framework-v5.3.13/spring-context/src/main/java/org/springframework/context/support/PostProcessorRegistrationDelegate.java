@@ -59,11 +59,12 @@ final class PostProcessorRegistrationDelegate {
 	 * 对 BeanDefinitionRegistry 类型的 BeanFactory 的处理, 以及 BeanFactoryPostProcess
 	 * 调用顺序问题的处理
 	 *
+	 * 对于 BeanDefinitionRegistry 类型的 BeanFactory 的处理
+	 *
 	 * @param beanFactory BeanFactory
 	 * @param beanFactoryPostProcessors 通过硬编码注册的 BeanFactoryPostProcess 类型的处理器
 	 * @see AbstractApplicationContext#getBeanFactoryPostProcessors()
 	 */
-	// 对于 BeanDefinitionRegistry 类型的 BeanFactory 的处理
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
