@@ -560,11 +560,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * 返回通过 addBeanFactoryPostProcessor() 方法添加的用于内部 BeanFactory 的 BeanFactoryPostProcessor 集合
+	 * @see AbstractApplicationContext#addBeanFactoryPostProcessor(BeanFactoryPostProcessor)
+	 *
 	 * Return the list of BeanFactoryPostProcessors that will get applied
 	 * to the internal BeanFactory.
-	 *
-	 * @see AbstractApplicationContext#addBeanFactoryPostProcessor(BeanFactoryPostProcessor)
-	 * 返回通过上述方法添加的 BeanFactoryProcessor
 	 */
 	public List<BeanFactoryPostProcessor> getBeanFactoryPostProcessors() {
 		// 将 beanFactoryPostProcessors 直接返回, 此 beanFactoryPostProcessors 集合中存放的是
@@ -860,6 +860,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * 根据顺序, 实例化并注册所有的 BeanFactoryPostProcessor Bean 实例
+	 *
 	 * Instantiate and invoke all registered BeanFactoryPostProcessor beans,
 	 * respecting explicit order if given.
 	 * <p>Must be called before singleton instantiation.
