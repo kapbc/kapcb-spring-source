@@ -1548,11 +1548,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * 判断父上下文是否为 AbstractApplicationContext 子类 :
+	 * 如果是则返回父类上下文的内部 MessageSource
+	 * 如果不是则返回父类上下文
+	 *
 	 * Return the internal message source of the parent context if it is an
 	 * AbstractApplicationContext too; else, return the parent context itself.
 	 */
 	@Nullable
 	protected MessageSource getInternalParentMessageSource() {
+		// 判断父上下文是否为 AbstractApplicationContext 子类,
+		// 如果是则返回父类上下文的内部 MessageSource, 如果不是则返回父类上下文
 		return (getParent() instanceof AbstractApplicationContext ?
 				((AbstractApplicationContext) getParent()).messageSource : getParent());
 	}
