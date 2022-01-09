@@ -16,9 +16,6 @@
 
 package org.springframework.web.context.support;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.support.GenericApplicationContext;
@@ -35,6 +32,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.ConfigurableWebApplicationContext;
 import org.springframework.web.context.ConfigurableWebEnvironment;
 import org.springframework.web.context.ServletContextAware;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 
 /**
  * Subclass of {@link GenericApplicationContext}, suitable for web environments.
@@ -177,6 +177,8 @@ public class GenericWebApplicationContext extends GenericApplicationContext
 
 	/**
 	 * Initialize the theme capability.
+	 *
+	 * 初始化主题功能
 	 */
 	@Override
 	protected void onRefresh() {

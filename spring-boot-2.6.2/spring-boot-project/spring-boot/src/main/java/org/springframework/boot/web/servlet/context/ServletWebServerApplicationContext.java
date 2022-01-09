@@ -155,8 +155,10 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 
 	@Override
 	protected void onRefresh() {
+		// 调用 GenericWebApplicationContext 初始化主题功能
 		super.onRefresh();
 		try {
+			// 启动 Spring Boot 的嵌入式 Tomcat 服务器
 			createWebServer();
 		}
 		catch (Throwable ex) {
@@ -172,13 +174,18 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		super.doClose();
 	}
 
+	/**
+	 * 启动 Spring Boot 嵌入式 Tomcat 服务器
+	 */
 	private void createWebServer() {
 		WebServer webServer = this.webServer;
 		ServletContext servletContext = getServletContext();
 		if (webServer == null && servletContext == null) {
 			StartupStep createWebServer = this.getApplicationStartup().start("spring.boot.webserver.create");
+			// 获取 webServer 工厂类, 因为 webServer 的提供者有多个 : JettyServletWebServerFactory、TomcatServletWebServerFactory、UndertowServletWebServerFactory
 			ServletWebServerFactory factory = getWebServerFactory();
 			createWebServer.tag("factory", factory.getClass().toString());
+			// 通过 webServer 工厂获取 webServer 并将其赋值给当前容器内的 webServer。同时还会启动 Tomcat 服务器
 			this.webServer = factory.getWebServer(getSelfInitializer());
 			createWebServer.end();
 			getBeanFactory().registerSingleton("webServerGracefulShutdown",
@@ -194,6 +201,7 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 				throw new ApplicationContextException("Cannot initialize servlet context", ex);
 			}
 		}
+		// 初始化资源
 		initPropertySources();
 	}
 
