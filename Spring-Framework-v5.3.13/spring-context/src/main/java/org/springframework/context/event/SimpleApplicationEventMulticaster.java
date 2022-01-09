@@ -16,11 +16,8 @@
 
 package org.springframework.context.event;
 
-import java.util.concurrent.Executor;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
@@ -28,6 +25,8 @@ import org.springframework.context.PayloadApplicationEvent;
 import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ErrorHandler;
+
+import java.util.concurrent.Executor;
 
 /**
  * Simple implementation of the {@link ApplicationEventMulticaster} interface.
@@ -134,12 +133,17 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	@Override
 	public void multicastEvent(final ApplicationEvent event, @Nullable ResolvableType eventType) {
 		ResolvableType type = (eventType != null ? eventType : resolveDefaultEventType(event));
+		// 获取线程池
 		Executor executor = getTaskExecutor();
+		// 遍历所有的监听器
 		for (ApplicationListener<?> listener : getApplicationListeners(event, type)) {
+			// 激活监听器
 			if (executor != null) {
+				// 如果获取的线程池不为空, 则异步执行激活监听器
 				executor.execute(() -> invokeListener(listener, event));
 			}
 			else {
+				// 否则就同步执行监听器
 				invokeListener(listener, event);
 			}
 		}
