@@ -892,19 +892,34 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * 初始化 MessageSource, 如果当前容器中没有则使用父工厂的
+	 * 提取配置中定义的MessageSource, 并将其记录在Spring容器中, 也就是AbstractApplicationContext中
+	 * 如果用户没有设置资源文件, Spring提供了默认的配置 DelegatingMessageSource
+	 * MessageSource 定义的 Bean 名字必须为 messageSource, 而如果找不到则
+	 * 会默认注册 DelegatingMessageSource 作为 messageSource 的 Bean
+	 *
 	 * Initialize the MessageSource.
 	 * Use parent's if none defined in this context.
 	 */
 	protected void initMessageSource() {
+		// 获取 BeanFactory
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
+		// 如果容器中没有 BeanName 为 messageSource 的 Bean 实例,
+		// 如果是自己注册的 MessageSource 组件, BeanName 一定要设置为 messageSource,
+		// 否则就会使用 Spring 默认的 DelegatingMessageSource
 		if (beanFactory.containsLocalBean(MESSAGE_SOURCE_BEAN_NAME)) {
+			// 从容器中获取 BeanName 为 messageSource 类型为 MessageSource 的 Bean 实例
 			this.messageSource = beanFactory.getBean(MESSAGE_SOURCE_BEAN_NAME, MessageSource.class);
 			// Make MessageSource aware of parent MessageSource.
+			// 判断父类是否不为空 && 当前对象的 messageSource 是 HierarchicalMessageSource 的实例
 			if (this.parent != null && this.messageSource instanceof HierarchicalMessageSource) {
+				// 将 messageSource 强制类型转换为 HierarchicalMessageSource 类型
 				HierarchicalMessageSource hms = (HierarchicalMessageSource) this.messageSource;
+				// 判断父 MessageSource 是否为空
 				if (hms.getParentMessageSource() == null) {
 					// Only set parent context as parent MessageSource if no parent MessageSource
 					// registered already.
+					// 将 HierarchicalMessageSource 的父 MessageSource 赋值为 getInternalParentMessageSource()
 					hms.setParentMessageSource(getInternalParentMessageSource());
 				}
 			}
@@ -914,9 +929,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 		else {
 			// Use empty MessageSource to be able to accept getMessage calls.
+			// 容器中不存在 BeanName 为 messageSource 的 Bean 实例
+			// 手动创建一个 DelegatingMessageSource 实例, 用于接受 getMessage 方法调用。
 			DelegatingMessageSource dms = new DelegatingMessageSource();
+			// 添加父类 MessageSource
 			dms.setParentMessageSource(getInternalParentMessageSource());
+			// 将 手动创建的 DelegatingMessageSource 赋值给当前容器中的 messageSource
 			this.messageSource = dms;
+			// 以 messageSource 为 BeanNme 将 DelegatingMessageSource 类的实例注册到一级缓存 singletonObjects 中
 			beanFactory.registerSingleton(MESSAGE_SOURCE_BEAN_NAME, this.messageSource);
 			if (logger.isTraceEnabled()) {
 				logger.trace("No '" + MESSAGE_SOURCE_BEAN_NAME + "' bean, using [" + this.messageSource + "]");
