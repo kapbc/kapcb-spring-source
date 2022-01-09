@@ -87,7 +87,7 @@ public interface BeanFactoryPostProcessor {
 	 * 2、BeanFactoryPostProcessor#postProcessBeanFactory 方法针对的是所有的 BeanDefinition
 	 * 全部已经加载完毕, 然后可以对这些 BeanDefinition 做一些属性的修改或者添加工作。
 	 *
-	 * 所以 Spring 官方建议的是 : BeanDefinitionRegistryPostProcessor 用来添加额外的BeanDefinition,
+	 * 所以 Spring 官方建议的是 : BeanDefinitionRegistryPostProcessor 用来添加额外的 BeanDefinition,
 	 * 而 BeanFactoryPostProcessor 用来修改已经加载完成的 BeanDefinition。
 	 *
 	 * BeanDefinitionRegistryPostProcessor 与 BeanFactoryPostProcess 的执行时机都是在 BeanDefinition
