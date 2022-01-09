@@ -908,7 +908,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// 如果是自己注册的 MessageSource 组件, BeanName 一定要设置为 messageSource,
 		// 否则就会使用 Spring 默认的 DelegatingMessageSource
 		if (beanFactory.containsLocalBean(MESSAGE_SOURCE_BEAN_NAME)) {
-			// 从容器中获取 BeanName 为 messageSource 类型为 MessageSource 的 Bean 实例
+			// 从容器中获取 BeanName 为 messageSource 类型为 MessageSource 的 Bean 实例, 并将其赋值给当前容器内部的 MessageSource
 			this.messageSource = beanFactory.getBean(MESSAGE_SOURCE_BEAN_NAME, MessageSource.class);
 			// Make MessageSource aware of parent MessageSource.
 			// 判断父类是否不为空 && 当前对象的 messageSource 是 HierarchicalMessageSource 的实例
