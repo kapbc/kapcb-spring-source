@@ -893,8 +893,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	/**
 	 * 初始化 MessageSource, 如果当前容器中没有则使用父工厂的
-	 * 提取配置中定义的MessageSource, 并将其记录在Spring容器中, 也就是AbstractApplicationContext中
-	 * 如果用户没有设置资源文件, Spring提供了默认的配置 DelegatingMessageSource
+	 * 提取配置中定义的 MessageSource, 并将其记录在 Spring 容器中, 也就是 AbstractApplicationContext 中
+	 * 如果用户没有设置资源文件, Spring 提供了默认的配置 DelegatingMessageSource
 	 * MessageSource 定义的 Bean 名字必须为 messageSource, 而如果找不到则
 	 * 会默认注册 DelegatingMessageSource 作为 messageSource 的 Bean
 	 *
@@ -945,12 +945,19 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
+	 * 初始化事件监听多路广播器, 如果在容器中没有定义则使用 SimpleApplicationEventMulticaster
+	 *
+	 * ApplicationEventMulticaster 定义的 Bean 名字必须为 applicationEventMulticaster, 而如果找不到则
+	 * Spring 会默认注册并使用 SimpleApplicationEventMulticaster 作为事件监听多路广播器
+	 *
 	 * Initialize the ApplicationEventMulticaster.
 	 * Uses SimpleApplicationEventMulticaster if none defined in the context.
 	 * @see org.springframework.context.event.SimpleApplicationEventMulticaster
 	 */
 	protected void initApplicationEventMulticaster() {
+		// 获取 BeanFactory
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
+		// 如果用户自定义了事件广播器, 在使用用户自定义的事件广播器
 		if (beanFactory.containsLocalBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME)) {
 			this.applicationEventMulticaster =
 					beanFactory.getBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, ApplicationEventMulticaster.class);
