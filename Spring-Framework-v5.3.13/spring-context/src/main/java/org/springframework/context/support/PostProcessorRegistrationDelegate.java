@@ -64,8 +64,7 @@ final class PostProcessorRegistrationDelegate {
 	 * @param beanFactoryPostProcessors 通过硬编码注册的 BeanFactoryPostProcess 类型的处理器
 	 * @see AbstractApplicationContext#getBeanFactoryPostProcessors()
 	 */
-	public static void invokeBeanFactoryPostProcessors(
-			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
+	public static void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
 		// WARNING: Although it may appear that the body of this method can be easily
 		// refactored to avoid the use of multiple loops and multiple lists, the use
@@ -287,13 +286,12 @@ final class PostProcessorRegistrationDelegate {
 	}
 
 	/**
-	 * 注册 BeanPostProcessor
+	 * 按照顺序实例化并注册所有的 BeanPostProcessor Bean
 	 *
 	 * @param beanFactory ConfigurableListableBeanFactory
 	 * @param applicationContext AbstractApplicationContext
 	 */
-	public static void registerBeanPostProcessors(
-			ConfigurableListableBeanFactory beanFactory, AbstractApplicationContext applicationContext) {
+	public static void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory, AbstractApplicationContext applicationContext) {
 
 		// WARNING: Although it may appear that the body of this method can be easily
 		// refactored to avoid the use of multiple loops and multiple lists, the use
