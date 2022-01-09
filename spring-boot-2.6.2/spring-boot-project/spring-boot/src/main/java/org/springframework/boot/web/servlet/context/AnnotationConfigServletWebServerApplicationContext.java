@@ -195,12 +195,21 @@ public class AnnotationConfigServletWebServerApplicationContext extends ServletW
 		super.prepareRefresh();
 	}
 
+	/**
+	 * override AbstractApplicationContext's postProcessBeanFactory()
+	 * template method in Spring IOC refresh()
+	 *
+	 * @param beanFactory ConfigurableListableBeanFactory
+	 */
 	@Override
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+		// 首先注册为 Web Application
 		super.postProcessBeanFactory(beanFactory);
+		// 扫描指定包下的 Bean 并将其进行注册
 		if (this.basePackages != null && this.basePackages.length > 0) {
 			this.scanner.scan(this.basePackages);
 		}
+		// 扫描指定注解的类下的 Bean 并将其注册
 		if (!this.annotatedClasses.isEmpty()) {
 			this.reader.register(ClassUtils.toClassArray(this.annotatedClasses));
 		}
