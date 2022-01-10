@@ -50,4 +50,13 @@ public class House {
 	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
+
+	@Override
+	public String toString() {
+		return "House{" +
+				"location='" + location + '\'' +
+				", size=" + size +
+				", price=" + price +
+				'}';
+	}
 }

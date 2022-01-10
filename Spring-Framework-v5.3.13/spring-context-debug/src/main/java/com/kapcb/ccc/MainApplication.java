@@ -1,5 +1,6 @@
 package com.kapcb.ccc;
 
+import com.kapcb.ccc.model.Person;
 import com.kapcb.ccc.model.TestBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -37,6 +38,9 @@ public class MainApplication {
 		TestBean testBean = applicationContext.getBean("testBean", TestBean.class);
 		// 调用方法
 		testBean.say();
+
+		Person kapcb = applicationContext.getBean("kapcb", Person.class);
+		System.out.println("kapcb = " + kapcb);
 	}
 
 }

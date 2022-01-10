@@ -1,5 +1,6 @@
 package com.kapcb.ccc.model;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -95,5 +96,18 @@ public class Person {
 
 	public void setHouses(Map<String, House> houses) {
 		this.houses = houses;
+	}
+
+	@Override
+	public String toString() {
+		return "Person{" +
+				"name='" + name + '\'' +
+				", age=" + age +
+				", school=" + school +
+				", girlFriends=" + Arrays.toString(girlFriends) +
+				", boyFriends=" + boyFriends +
+				", phoneNumbers=" + phoneNumbers +
+				", houses=" + houses +
+				'}';
 	}
 }

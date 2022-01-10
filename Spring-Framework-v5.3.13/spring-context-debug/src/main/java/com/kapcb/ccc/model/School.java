@@ -38,4 +38,11 @@ public class School {
 		this.location = location;
 	}
 
+	@Override
+	public String toString() {
+		return "School{" +
+				"schoolName='" + schoolName + '\'' +
+				", location='" + location + '\'' +
+				'}';
+	}
 }
