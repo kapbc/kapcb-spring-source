@@ -47,7 +47,6 @@ public class MainApplication {
 		System.out.println("person = " + person);
 
 		PersonFactoryBean bean = applicationContext.getBean("&personFactoryBean", PersonFactoryBean.class);
-		Person object = bean.getObject();
 	}
 
 }
