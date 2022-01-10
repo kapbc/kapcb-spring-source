@@ -61,6 +61,18 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.beans.factory.BeanFactory
  * @see org.springframework.aop.framework.ProxyFactoryBean
  * @see org.springframework.jndi.JndiObjectFactoryBean
+ *
+ * FactoryBean 顾名思义, 它是一个 Bean, 这个 Bean 并不是一个常规的、简单的 Bean, 因为常规的
+ * Bean 可以使用 BeanFactory 来进行创建。而 FactoryBean 是一个能生产或者修饰对象生成的工厂
+ * Bean, 它的实现与设计模式中的工厂模式和修饰器模式类似。
+ *
+ * 通常情况下, 对于一些常规的 Bean 而言, Spring 可以通过利用 XML 配置或者配置类通过反射机制来实例化 Bean 实例。
+ * 在某些情况下, 我们需要对一些特殊的 Bean 进行高级定制, 其实例化过程比较复杂, 而如果使用传统方式(XML 配置或者配置类)
+ * 来进行实例化, 则需要在配置类中提供大量的配置信息, 这种配置方式的灵活性是受到限制的。如果采用硬编码的形式可能会相较而言
+ * 非常简单。Spring 为此提供了 org.springframework.beans.factory.FactoryBean<T> 的工厂类接口。用户可以通过实现
+ * 该接口定制化 Bean 的实例化逻辑。
+ *
+ *
  */
 public interface FactoryBean<T> {
 
