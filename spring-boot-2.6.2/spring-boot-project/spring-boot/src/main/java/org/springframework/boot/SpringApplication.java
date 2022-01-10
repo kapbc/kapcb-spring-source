@@ -261,10 +261,11 @@ public class SpringApplication {
 		// 推断 web 服务类型
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
 		this.bootstrapRegistryInitializers = new ArrayList<>(getSpringFactoriesInstances(BootstrapRegistryInitializer.class));
-		// 从 META-INF/spring.factories 取出初始化器的完全限定名(并不是对象)
+		// 完全限定名 -> 包名 + 类名
+		// 从 META-INF/spring.factories 取出初始化器的完全限定名(并不是对象), 然后在实例化对象
 		// 工厂加载应用上下文初始化器, 利用 Spring 工厂加载机制, 实例化 ApplicationContextInitializer 实现类, 并排序对象集合
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
-		// 从 META-INF/spring.factories 取出监听器的完全限定名(并不是对象)
+		// 从 META-INF/spring.factories 取出监听器的完全限定名(并不是对象), 然后在实例化对象
 		// 工厂加载应用上下文初始化监听器
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
 		// 推断实际启动引导类
