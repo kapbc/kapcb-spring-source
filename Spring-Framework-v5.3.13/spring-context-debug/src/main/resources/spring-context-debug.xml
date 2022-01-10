@@ -65,4 +65,6 @@
 		</property>
 	</bean>
 
+	<bean id="personFactoryBean" class="com.kapcb.ccc.model.PersonFactoryBean" />
+
 </beans>

@@ -1,5 +1,8 @@
 package com.kapcb.ccc.model;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +18,8 @@ import java.util.Set;
  */
 public class Person {
 
+	private final Log log = LogFactory.getLog(getClass());
+
 	private String name;
 
 	private int age;
@@ -29,10 +34,12 @@ public class Person {
 
 	private Map<String, House> houses;
 
+	private DebugBean debugBean;
+
 	public Person() {
 	}
 
-	public Person(String name, int age, School school, String[] girlFriends, List<String> boyFriends, Set<String> phoneNumbers, Map<String, House> houses) {
+	public Person(String name, int age, School school, String[] girlFriends, List<String> boyFriends, Set<String> phoneNumbers, Map<String, House> houses, DebugBean debugBean) {
 		this.name = name;
 		this.age = age;
 		this.school = school;
@@ -40,6 +47,7 @@ public class Person {
 		this.boyFriends = boyFriends;
 		this.phoneNumbers = phoneNumbers;
 		this.houses = houses;
+		this.debugBean = debugBean;
 	}
 
 	public String getName() {
@@ -98,6 +106,15 @@ public class Person {
 		this.houses = houses;
 	}
 
+	public DebugBean getDebugBean() {
+		return debugBean;
+	}
+
+	public void setDebugBean(DebugBean debugBean) {
+		log.info("Spring 调用 setDebugBean 方法为 Person 注入属性");
+		this.debugBean = debugBean;
+	}
+
 	@Override
 	public String toString() {
 		return "Person{" +
@@ -108,6 +125,7 @@ public class Person {
 				", boyFriends=" + boyFriends +
 				", phoneNumbers=" + phoneNumbers +
 				", houses=" + houses +
+				", debugBean=" + debugBean +
 				'}';
 	}
 }

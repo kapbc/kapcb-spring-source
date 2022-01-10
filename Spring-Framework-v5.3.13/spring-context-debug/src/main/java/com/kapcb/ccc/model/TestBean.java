@@ -34,4 +34,11 @@ public class TestBean implements DebugBean {
 		this.username = username;
 	}
 
+	@Override
+	public String toString() {
+		return "TestBean{" +
+				"username='" + username + '\'' +
+				'}';
+	}
+
 }

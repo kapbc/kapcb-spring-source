@@ -1,6 +1,7 @@
 package com.kapcb.ccc;
 
 import com.kapcb.ccc.model.Person;
+import com.kapcb.ccc.model.PersonFactoryBean;
 import com.kapcb.ccc.model.TestBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -31,7 +32,7 @@ public class MainApplication {
 	 *
 	 * @param args String[]
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		// 指定配置文件获取 Spring Application Context 容器
 		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring-context-debug.xml");
 		// 从 IOC 容器中获取注册的 Bean 实例对象
@@ -41,6 +42,12 @@ public class MainApplication {
 
 		Person kapcb = applicationContext.getBean("kapcb", Person.class);
 		System.out.println("kapcb = " + kapcb);
+
+		Person person = applicationContext.getBean("personFactoryBean", Person.class);
+		System.out.println("person = " + person);
+
+		PersonFactoryBean bean = applicationContext.getBean("&personFactoryBean", PersonFactoryBean.class);
+		Person object = bean.getObject();
 	}
 
 }
