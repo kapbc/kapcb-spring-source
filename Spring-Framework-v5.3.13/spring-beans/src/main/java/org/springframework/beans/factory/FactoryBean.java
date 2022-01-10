@@ -72,7 +72,8 @@ import org.springframework.lang.Nullable;
  * 非常简单。Spring 为此提供了 org.springframework.beans.factory.FactoryBean<T> 的工厂类接口。用户可以通过实现
  * 该接口定制化 Bean 的实例化逻辑。
  *
- *
+ * 当一个 Bean 实现 FactoryBean 时, 在 Spring 容器通过 getBean() 方法获取该 Bean 实例的时候会调用 FactoryBean#getObject()
+ * 方法返回的对象, 而不是 FactotryBean 本身, 相当于 FactoryBean#getObject() 代理了 getBean() 方法。
  */
 public interface FactoryBean<T> {
 
@@ -103,6 +104,12 @@ public interface FactoryBean<T> {
 	 * @return an instance of the bean (can be {@code null})
 	 * @throws Exception in case of creation errors
 	 * @see FactoryBeanNotInitializedException
+	 *
+	 * 返回由于 FactoryBean 创建的 Bean 实例, 如果 isSingleton() 返回 true, 则
+	 * 该 Bean 实例会放入 Spring 的一级缓存中
+	 *
+	 * @see FactoryBean#isSingleton()
+	 * @see org.springframework.beans.factory.support.DefaultSingletonBeanRegistry#singletonObjects
 	 */
 	@Nullable
 	T getObject() throws Exception;
@@ -125,6 +132,8 @@ public interface FactoryBean<T> {
 	 * @return the type of object that this FactoryBean creates,
 	 * or {@code null} if not known at the time of the call
 	 * @see ListableBeanFactory#getBeansOfType
+	 *
+	 * 返回 FactoryBean 创建的 Bean 类型
 	 */
 	@Nullable
 	Class<?> getObjectType();
@@ -153,6 +162,9 @@ public interface FactoryBean<T> {
 	 * @return whether the exposed object is a singleton
 	 * @see #getObject()
 	 * @see SmartFactoryBean#isPrototype()
+	 *
+	 * 返回由 FactoryBean 创建的 Bean 实例的作用域是单例还是原型
+	 * true -> singleton / false -> prototype
 	 */
 	default boolean isSingleton() {
 		return true;
