@@ -59,4 +59,5 @@ public class House {
 				", price=" + price +
 				'}';
 	}
+
 }
