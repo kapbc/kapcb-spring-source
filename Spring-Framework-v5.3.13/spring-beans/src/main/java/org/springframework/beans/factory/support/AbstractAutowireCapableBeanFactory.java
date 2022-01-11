@@ -181,9 +181,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// 接口进行注入或者 ApplicationContext 接口通过 ApplicationContextAware 接口进行注入。
 		// Spring 中一共定义了9个 *Aware 类型的接口, 分为两个容器
 		// BeanFactory 容器中3个 : BeanNameAware、BeanFactoryAware、BeanClassLoaderAware
-		// ApplicationContext 容器6个 : EnvironmentAware、EmbeddedValueResolverAware、ResourceLoaderAware、ApplicationEventPublisherAware、MessageSourceAware、ApplicationContextAware
+		// ApplicationContext 容器7个 : EnvironmentAware、EmbeddedValueResolverAware、ResourceLoaderAware、ApplicationEventPublisherAware、MessageSourceAware、ApplicationContextAware、ApplicationStartupAware
 		// BeanFactory 容器的3个接口在 Bean 初始化时的 initializeBean() 方法中进行激活
-		// ApplicationContext 容器的6个接口在 Bean 创建时的 applyBeanPostProcessorsBeforeInitialization() 方法中进行激活
+		// ApplicationContext 容器的7个接口在 Bean 创建时的 applyBeanPostProcessorsBeforeInitialization() 方法中进行激活
 		ignoreDependencyInterface(BeanNameAware.class);
 		ignoreDependencyInterface(BeanFactoryAware.class);
 		ignoreDependencyInterface(BeanClassLoaderAware.class);
