@@ -70,5 +70,4 @@ public class PersonFactoryBean implements FactoryBean<Person> {
 		log.info("Spring 调用 PersonFactoryBean#isSingleton() 方法");
 		return true;
 	}
-
 }
