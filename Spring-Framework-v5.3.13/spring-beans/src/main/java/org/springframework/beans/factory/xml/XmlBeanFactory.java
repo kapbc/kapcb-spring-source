@@ -49,6 +49,16 @@ import org.springframework.core.io.Resource;
  * @see XmlBeanDefinitionReader
  * @deprecated as of Spring 3.1 in favor of {@link DefaultListableBeanFactory} and
  * {@link XmlBeanDefinitionReader}
+ *
+ * XmlBeanFactory 容器的基础
+ * 但是从 Spring 3.1 以后已经废弃了 XmlBeanFactory 这个类了, 现在 Spring 推荐使用的是
+ * ApplicationContext。
+ * 被废弃的原因 :
+ * 1、XmlBeanFactory 对作用域的支持单一, BeanFactory 只支持两个作用域 Singleton 和 Prototype。
+ * 2、XmlBeanFactory 延迟加载。在企业级的项目当中, 对 Bean 的需求往往是比较大的, 延迟加载确实会在
+ * 启动时释放很多的压力, 但是当程序运行的时候进行大量的 Bean 的初始化, 也会出现性能瓶颈。
+ * 3、XmlBeanFactory 不会自动注册接口
+ * 4、XmlBeanFactory 对于企业级项目并没有太好的支持
  */
 @Deprecated
 @SuppressWarnings({"serial", "all"})
