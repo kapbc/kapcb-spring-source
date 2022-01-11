@@ -22,6 +22,8 @@ package org.springframework.core;
  *
  * @author Juergen Hoeller
  * @since 2.5.2
+ *
+ * 管理 aliases 的通用接口, 对 aliases 的增删改等操作
  */
 public interface AliasRegistry {
 
