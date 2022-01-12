@@ -429,6 +429,10 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @throws Exception when thrown from the DocumentLoader
 	 * @see #setDocumentLoader
 	 * @see DocumentLoader#loadDocument
+	 *
+	 * 经过了验证模式准备的步骤就可以进行 Document 加载
+	 * XmlBeanDefinitionReader 类并对于文档读取并没有亲历亲为, 而是将其
+	 * 委托给了 DocumentLoader 接口去执行
 	 */
 	protected Document doLoadDocument(InputSource inputSource, Resource resource) throws Exception {
 		return this.documentLoader.loadDocument(inputSource, getEntityResolver(), this.errorHandler,
