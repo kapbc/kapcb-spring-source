@@ -122,10 +122,6 @@ import java.util.function.Supplier;
  */
 public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory
 		implements AutowireCapableBeanFactory {
-		
-		
-		
-		
 
 	/** Strategy for creating bean instances. */
 	private InstantiationStrategy instantiationStrategy;
