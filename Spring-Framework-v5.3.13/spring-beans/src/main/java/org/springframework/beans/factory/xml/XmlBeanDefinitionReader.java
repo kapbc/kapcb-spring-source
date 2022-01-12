@@ -442,12 +442,18 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * <p>Override this method if you would like full control over the validation
 	 * mode, even when something other than {@link #VALIDATION_AUTO} was set.
 	 * @see #detectValidationMode
+	 *
+	 * 获取对应资源的验证模式, 如果指定了验证模式则使用指定的验证模式, 如果未指定验证模式
+	 * 则使用默认的验证模式
 	 */
 	protected int getValidationModeForResource(Resource resource) {
+		// 获取指定的验证模式。可以通过 XmlBeanDefinitionReader#setValidating 方法进行设定
 		int validationModeToUse = getValidationMode();
+		// 如果手动指定了验证模式则使用指定的验证模式
 		if (validationModeToUse != VALIDATION_AUTO) {
 			return validationModeToUse;
 		}
+		// 如果未指定则使用自动检测
 		int detectedMode = detectValidationMode(resource);
 		if (detectedMode != VALIDATION_AUTO) {
 			return detectedMode;
@@ -464,6 +470,8 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * definition then DTD validation is used otherwise XSD validation is assumed.
 	 * <p>Override this method if you would like to customize resolution
 	 * of the {@link #VALIDATION_AUTO} mode.
+	 *
+	 * 进行自动验证
 	 */
 	protected int detectValidationMode(Resource resource) {
 		if (resource.isOpen()) {
