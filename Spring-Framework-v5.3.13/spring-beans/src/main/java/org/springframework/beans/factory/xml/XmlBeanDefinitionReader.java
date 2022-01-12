@@ -259,6 +259,12 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	/**
 	 * Return the EntityResolver to use, building a default resolver
 	 * if none specified.
+	 *
+	 * 如果 SAX 应用程序需要实现自定义处理外部实体, 则必须实现 EntityResolver 接口并
+	 * 使用 setEntityResolver 方法向 SAX 驱动器注册一个实例。也就是说对于解析一个 XML
+	 * 文件, SAX 首先读取该 XML 文档上的声明, 根据声明去寻找相应的 DTD 定义, 以便对文档
+	 * 进行一个验证。
+	 * 默认的寻找规则是通过网络(声明的 DTD 的 URI 地址)来下载相应的 DTD 声明, 并进行认证
 	 */
 	protected EntityResolver getEntityResolver() {
 		if (this.entityResolver == null) {
