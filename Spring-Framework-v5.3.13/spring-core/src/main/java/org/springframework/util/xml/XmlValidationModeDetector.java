@@ -87,6 +87,8 @@ public class XmlValidationModeDetector {
 	 * @throws IOException in case of I/O failure
 	 * @see #VALIDATION_DTD
 	 * @see #VALIDATION_XSD
+	 *
+	 * Spring 用来检测验证模式, 如果包含 DOCTYPE 就是DTD, 否则就是 XSD
 	 */
 	public int detectValidationMode(InputStream inputStream) throws IOException {
 		// Peek into the file to look for DOCTYPE.
@@ -99,6 +101,7 @@ public class XmlValidationModeDetector {
 				if (this.inComment || !StringUtils.hasText(content)) {
 					continue;
 				}
+				// 检查是否包含 'DOCTYPE' 字符
 				if (hasDoctype(content)) {
 					isDtdValidated = true;
 					break;
