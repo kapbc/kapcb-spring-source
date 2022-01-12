@@ -122,9 +122,6 @@ import java.util.function.Supplier;
  */
 
 
-
-
-
 public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory
 		implements AutowireCapableBeanFactory {
 
