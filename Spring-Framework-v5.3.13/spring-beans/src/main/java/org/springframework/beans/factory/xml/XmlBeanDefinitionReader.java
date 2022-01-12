@@ -453,7 +453,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		if (validationModeToUse != VALIDATION_AUTO) {
 			return validationModeToUse;
 		}
-		// 如果未指定则使用自动检测
+		// 如果未指定则使用自动检测, 在 detectValidationMode 函数中又将自动检测验证模式的工作
+		// 委托给了专门处理类 XmlValidationModeDetector, 调用了 XmlValidationModeDetector 的
+		// validationModeDetector 方法。
 		int detectedMode = detectValidationMode(resource);
 		if (detectedMode != VALIDATION_AUTO) {
 			return detectedMode;
@@ -494,6 +496,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		}
 
 		try {
+			// 将自动检测验证模式的工作委托给了专门处理类 XmlValidationModelDetector
 			return this.validationModeDetector.detectValidationMode(inputStream);
 		}
 		catch (IOException ex) {
