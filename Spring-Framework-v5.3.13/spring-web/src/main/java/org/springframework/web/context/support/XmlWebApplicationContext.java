@@ -128,8 +128,11 @@ public class XmlWebApplicationContext extends AbstractRefreshableWebApplicationC
 	 * @see #getResourcePatternResolver
 	 */
 	protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws IOException {
+		// 获取 XML 配置文件的路径, 即 web.xml 配置文件中的 contextConfigLocation 元素, 它指明了 XML 配置文件的路径。
+		// 如果 web.xml 配置文件中没有配置则使用默认的地址
 		String[] configLocations = getConfigLocations();
 		if (configLocations != null) {
+			// 遍历读取每个 XML 配置文件
 			for (String configLocation : configLocations) {
 				reader.loadBeanDefinitions(configLocation);
 			}
