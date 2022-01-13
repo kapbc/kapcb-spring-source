@@ -77,6 +77,8 @@ public interface BeanDefinitionReader {
 	 * <p>{@code null} suggests to not load bean classes eagerly
 	 * but rather to just register bean definitions with class names,
 	 * with the corresponding Classes to be resolved later (or never).
+	 *
+	 * 返回用于加载 Bean Class 的 ClassLoader
 	 */
 	@Nullable
 	ClassLoader getBeanClassLoader();
