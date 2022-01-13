@@ -16,14 +16,14 @@
 
 package org.springframework.beans.factory.config;
 
-import java.util.Set;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.TypeConverter;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.lang.Nullable;
+
+import java.util.Set;
 
 /**
  * Extension of the {@link org.springframework.beans.factory.BeanFactory}
@@ -58,6 +58,9 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.beans.factory.BeanFactoryAware
  * @see org.springframework.beans.factory.config.ConfigurableListableBeanFactory
  * @see org.springframework.context.ApplicationContext#getAutowireCapableBeanFactory()
+ *
+ * 继承 BeanFactory 接口，在 BeanFactory 的基础功能上提供对创建 Bean 、自动注入、初始化、Bean 的后置处理器(增强器)。
+ *
  */
 public interface AutowireCapableBeanFactory extends BeanFactory {
 
