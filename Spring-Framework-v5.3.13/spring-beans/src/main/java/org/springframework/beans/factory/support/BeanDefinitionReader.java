@@ -123,6 +123,8 @@ public interface BeanDefinitionReader {
 	 * @see #getResourceLoader()
 	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource)
 	 * @see #loadBeanDefinitions(org.springframework.core.io.Resource[])
+	 *
+	 * 从指定的 resource location 获取 BeanDefinition
 	 */
 	int loadBeanDefinitions(String location) throws BeanDefinitionStoreException;
 
