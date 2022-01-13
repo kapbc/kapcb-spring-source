@@ -174,6 +174,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	public AbstractAutowireCapableBeanFactory() {
 		// 调用 AbstractBeanFactory 构造器
 		super();
+		// Spring 中初始化否个 Bean 实例时, 如果 A 类中依赖 B 这个 Bean, 那么 Spring 在创建 A 这个 Bean 的时候就会自动将 A 创建并注入进去
 		// 设置忽略指定 *Aware 接口的自动装配功能
 		// Spring 官方针对 *Aware 接口的定义 : Spring 提供了广泛的 Aware 回调接口, 让 Bean 向容器表明它们需要某种基础设施依赖
 		// 为何需要忽略接口的自动装配功能, Spring 中给出的解释是 : 自动装配时忽略给定的依赖接口
