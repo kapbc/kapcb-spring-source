@@ -143,13 +143,18 @@ public class XmlWebApplicationContext extends AbstractRefreshableWebApplicationC
 	 * The default location for the root context is "/WEB-INF/applicationContext.xml",
 	 * and "/WEB-INF/test-servlet.xml" for a context with the namespace "test-servlet"
 	 * (like for a DispatcherServlet instance with the servlet-name "test").
+	 *
+	 * 获取默认的 XML 配置文件路径
 	 */
 	@Override
 	protected String[] getDefaultConfigLocations() {
+		// 当设置了容器的 namespace 时
 		if (getNamespace() != null) {
+			// 返回 /WEB-INF/ + ApplicationContext 的 namespace + .xml
 			return new String[] {DEFAULT_CONFIG_LOCATION_PREFIX + getNamespace() + DEFAULT_CONFIG_LOCATION_SUFFIX};
 		}
 		else {
+			// 没有设置 namespace 时, 直接返回 /WEB-INF/applicationContext.xml
 			return new String[] {DEFAULT_CONFIG_LOCATION};
 		}
 	}
