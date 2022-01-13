@@ -86,6 +86,8 @@ public interface BeanDefinitionReader {
 	/**
 	 * Return the BeanNameGenerator to use for anonymous beans
 	 * (without explicit bean name specified).
+	 *
+	 * 为没有指定 BeanName 的 Bean 生成默认的 BeanName
 	 */
 	BeanNameGenerator getBeanNameGenerator();
 
