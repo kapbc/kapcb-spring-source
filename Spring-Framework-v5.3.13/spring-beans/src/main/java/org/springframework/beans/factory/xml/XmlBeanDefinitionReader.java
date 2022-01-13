@@ -328,6 +328,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 			logger.trace("Loading XML bean definitions from " + encodedResource);
 		}
 
+		// 获取当前的线程变量, 用于保存 经过 EncodedResource 包装后的 resource
 		Set<EncodedResource> currentResources = this.resourcesCurrentlyBeingLoaded.get();
 
 		if (!currentResources.add(encodedResource)) {
@@ -337,6 +338,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 		// 加载 XML 配置文件为 IO 流
 		try (InputStream inputStream = encodedResource.getResource().getInputStream()) {
+			// xml 的 input
 			InputSource inputSource = new InputSource(inputStream);
 			// 设置编码
 			if (encodedResource.getEncoding() != null) {
