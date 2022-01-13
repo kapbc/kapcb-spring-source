@@ -36,6 +36,8 @@ import org.springframework.lang.Nullable;
  * @author Juergen Hoeller
  * @since 1.1
  * @see org.springframework.core.io.Resource
+ *
+ * 从 XML 配置文件中读取 BeanDefintion
  */
 public interface BeanDefinitionReader {
 
