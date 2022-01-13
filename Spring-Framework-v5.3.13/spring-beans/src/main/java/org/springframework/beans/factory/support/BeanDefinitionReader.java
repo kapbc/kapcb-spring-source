@@ -66,6 +66,8 @@ public interface BeanDefinitionReader {
 	 * This is a convenience to avoid explicit ResourceLoader handling.
 	 * @see #loadBeanDefinitions(String)
 	 * @see org.springframework.core.io.support.ResourcePatternResolver
+	 *
+	 * 返回用于加载 resource 的 ResourceLoader
 	 */
 	@Nullable
 	ResourceLoader getResourceLoader();
