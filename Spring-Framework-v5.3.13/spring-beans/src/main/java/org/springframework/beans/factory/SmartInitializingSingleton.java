@@ -40,6 +40,17 @@ package org.springframework.beans.factory;
  * @author Juergen Hoeller
  * @since 4.1
  * @see org.springframework.beans.factory.config.ConfigurableListableBeanFactory#preInstantiateSingletons()
+ *
+ * SmartInitializingSingleton 接口可以被单例的 Bean 实现, 并重写 afterSingletonsInstantiated() 方法。
+ *
+ * 容器中所有实现了 SmartInitializingSingleton 接口子类的 afterSingletonsInstantiated() 方法都会在
+ * 单实例 Bean 实例化完成之后进行回调。
+ *
+ * SmartInitializingSingleton 接口可以解决一些因为 Bean 初始化太早而出现的错误和问题。
+ *
+ * SmartInitializingSingleton 接口可以作为InitializingBean接口的一种替代方案。
+ *
+ * SmartInitializingSingleton 接口不能作用于懒加载的 Bean
  */
 public interface SmartInitializingSingleton {
 
