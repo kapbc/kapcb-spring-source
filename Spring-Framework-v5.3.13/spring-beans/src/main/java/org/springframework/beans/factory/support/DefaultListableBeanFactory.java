@@ -385,6 +385,16 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		return this.beanDefinitionMap.containsKey(beanName);
 	}
 
+	/**
+	 * 获取 beanDefinitionMap 中的 BeanDefinition 的个数
+	 * 在将 BeanDefinition 进行注册之前, 会获取之前读取的 BeanDefinition 的个数。
+	 *
+	 * beanDefinitionMap 是存储最终的 XML 解析后 BeanDefinition 的容器,
+	 * XML 配置文件解析后是由 GenericBeanDefinition 进行存储,
+	 * beanDefinitionMap 存储格式是 key --> String value --> GenericBeanDefinition
+	 *
+	 * @return int
+	 */
 	@Override
 	public int getBeanDefinitionCount() {
 		return this.beanDefinitionMap.size();
