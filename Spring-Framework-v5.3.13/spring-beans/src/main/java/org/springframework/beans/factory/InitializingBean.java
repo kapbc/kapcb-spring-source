@@ -30,6 +30,12 @@ package org.springframework.beans.factory;
  * @see DisposableBean
  * @see org.springframework.beans.factory.config.BeanDefinition#getPropertyValues()
  * @see org.springframework.beans.factory.support.AbstractBeanDefinition#getInitMethodName()
+ *
+ * InitializingBean 接口在每个 Bean 初始化完成之后进行回调
+ *
+ * InitializingBean 接口可以作用于 singleton Bean 和 prototype Bean 实例
+ *
+ * InitializingBean 接口不能作用于懒加载的 Bean
  */
 public interface InitializingBean {
 
