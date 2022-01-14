@@ -1785,6 +1785,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		if (result == null) {
 			// 拿到 BeanName 对应的 Bean 实例的类型
 			// 实际调用 AbstractAutowireCapableBeanFactory#predictBeanType() 方法
+			// 因为当前默认的 BeanFactory 为 DefaultListableBeanFactory, 而 DefaultListableBeanFactory
+			// 继承了 AbstractAutowireCapableBeanFactory, 所以这里走的是 AbstractAutowireCapableBeanFactory#predictBeanType() 的重写方法
 			Class<?> beanType = predictBeanType(beanName, mbd, FactoryBean.class);
 			// 返回 beanType 是否为 FactoryBean 本身、子类或子接口
 			result = (beanType != null && FactoryBean.class.isAssignableFrom(beanType));
