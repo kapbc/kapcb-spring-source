@@ -999,8 +999,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						.tag("beanName", beanName);
 				// 将获取的 singletonInstance 类型转换为 SmartInitializingSingleton 接口
 				SmartInitializingSingleton smartSingleton = (SmartInitializingSingleton) singletonInstance;
+				// 触发 SmartInitializingSingleton 实现类的 afterSingletonsInstantiated() 方法
 				if (System.getSecurityManager() != null) {
-					// 触发 SmartInitializingSingleton 实现类的 afterSingletonsInstantiated() 方法
 					AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
 						smartSingleton.afterSingletonsInstantiated();
 						return null;
