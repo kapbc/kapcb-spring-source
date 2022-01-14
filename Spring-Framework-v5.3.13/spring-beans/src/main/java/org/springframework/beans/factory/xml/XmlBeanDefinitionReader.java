@@ -338,9 +338,9 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 		// 加载 XML 配置文件为 IO 流
 		try (InputStream inputStream = encodedResource.getResource().getInputStream()) {
-			// xml 的 input
+			// xml 的 input, InputSource 并不是 Spring 的, 而是 org.xml.sax
 			InputSource inputSource = new InputSource(inputStream);
-			// 设置编码
+			// 如果 encodedResource 中的 encoding 不是 null 则同步设置 inputSource 的 encoding 编码
 			if (encodedResource.getEncoding() != null) {
 				inputSource.setEncoding(encodedResource.getEncoding());
 			}
