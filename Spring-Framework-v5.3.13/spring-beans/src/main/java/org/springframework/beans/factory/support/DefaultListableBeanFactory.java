@@ -956,13 +956,16 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				// 判断是否实现 BeanFactory 接口, 如果实现了 BeanFactory 接口, 判断是否立即初始化
 				// 判断 Bean 是否立即初始化, 根据 Bean 是否实现了 SmartFactoryBean 接口并重写内部方法 isEagerInit 并返回 true
 				if (isFactoryBean(beanName)) {
-					// 根据 & + beanName 来获取 IOC 容器中的 Bean 对象
+					// 如果是 FactoryBean 则根据 & + BeanName 来获取 IOC 容器中的 FactoryBean 对象
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
-					// 进行类型转换
+					// 如果根据 '&' + BeanName 获取的 Bean 是 FactoryBean 类型实例
 					if (bean instanceof FactoryBean) {
+						// 将 Bean 强制类型转换为 FactoryBean<?>
 						FactoryBean<?> factory = (FactoryBean<?>) bean;
 						// 判断这个 FactoryBean 是否希望立即初始化
 						boolean isEagerInit;
+						// 判断 Bean 是否实现了 SmartFactoryBean 接口, 如果实现了 SmartFactoryBean 则调用 isEagerInit
+						// 方法判断是否希望急切的进行初始化
 						if (System.getSecurityManager() != null && factory instanceof SmartFactoryBean) {
 							isEagerInit = AccessController.doPrivileged(
 									(PrivilegedAction<Boolean>) ((SmartFactoryBean<?>) factory)::isEagerInit,
