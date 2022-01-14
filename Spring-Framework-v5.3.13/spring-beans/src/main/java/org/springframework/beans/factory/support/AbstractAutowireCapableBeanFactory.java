@@ -772,6 +772,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return exposedObject;
 	}
 
+	/**
+	 *
+	 * @param beanName the name of the bean
+	 * @param mbd the merged bean definition to determine the type for
+	 * @param typesToMatch the types to match in case of internal type matching purposes
+	 * (also signals that the returned {@code Class} will never be exposed to application code)
+	 * @return Class<?>
+	 *
+	 * 根据 BeanName 获取对应的 Bean 实例的类型
+	 */
 	@Override
 	@Nullable
 	protected Class<?> predictBeanType(String beanName, RootBeanDefinition mbd, Class<?>... typesToMatch) {

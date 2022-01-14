@@ -1200,16 +1200,25 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 	@Override
 	public boolean isFactoryBean(String name) throws NoSuchBeanDefinitionException {
+		// 获取真正的 BeanName(去掉&前缀、解析别名)
 		String beanName = transformedBeanName(name);
+		// 尝试从 IOC 缓存容器中获取 BeanName 对应的 Bean 实例对象
 		Object beanInstance = getSingleton(beanName, false);
+		// 如果从容器中获取到 Bean 实例
 		if (beanInstance != null) {
+			// 直接判断是否是 FactoryBean 类型实例并返回
 			return (beanInstance instanceof FactoryBean);
 		}
 		// No singleton instance found -> check bean definition.
+		// 如果 BeanDefinition 缓存中不存在此 BeanName && 父 beanFactory 是 ConfigurableBeanFactory 类型实例
 		if (!containsBeanDefinition(beanName) && getParentBeanFactory() instanceof ConfigurableBeanFactory) {
 			// No bean definition found in this factory -> delegate to parent.
+			// 则调用父 BeanFactory 判断是否为 FactoryBean [递归调用]
 			return ((ConfigurableBeanFactory) getParentBeanFactory()).isFactoryBean(name);
 		}
+		// 通过 MergedBeanDefinition 来检查 BeanName 对应的 Bean 是否为 FactoryBean
+		// 首先通过 getMergedLocalBeanDefinition(beanName) 获取 BeanName 的 MergedBeanDefinition
+		// 然后调用 isFactoryBean() 方法判断 BeanName 对应的 Bean 是否是 FactoryBean
 		return isFactoryBean(beanName, getMergedLocalBeanDefinition(beanName));
 	}
 
@@ -1749,6 +1758,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @param typesToMatch the types to match in case of internal type matching purposes
 	 * (also signals that the returned {@code Class} will never be exposed to application code)
 	 * @return the type of the bean, or {@code null} if not predictable
+	 *
+	 * 根据 BeanName 获取对应的 Bean 实例的类型
 	 */
 	@Nullable
 	protected Class<?> predictBeanType(String beanName, RootBeanDefinition mbd, Class<?>... typesToMatch) {
@@ -1768,12 +1779,19 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @param mbd the corresponding bean definition
 	 */
 	protected boolean isFactoryBean(String beanName, RootBeanDefinition mbd) {
+		// 容根据 BeanName 获取的 MergedBeanDefinition 中获取该 Bean 是否为 FactoryBean
 		Boolean result = mbd.isFactoryBean;
+		// 如果获取的结果为空
 		if (result == null) {
+			// 拿到 BeanName 对应的 Bean 实例的类型
+			// 实际调用 AbstractAutowireCapableBeanFactory#predictBeanType() 方法
 			Class<?> beanType = predictBeanType(beanName, mbd, FactoryBean.class);
+			// 返回 beanType 是否为 FactoryBean 本身、子类或子接口
 			result = (beanType != null && FactoryBean.class.isAssignableFrom(beanType));
+			// 将结果赋值给 MergedBeanDefinition 中的 isFactoryBean 属性
 			mbd.isFactoryBean = result;
 		}
+		// 返回结果
 		return result;
 	}
 
