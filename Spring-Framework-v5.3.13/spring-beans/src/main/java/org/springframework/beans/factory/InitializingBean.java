@@ -31,11 +31,13 @@ package org.springframework.beans.factory;
  * @see org.springframework.beans.factory.config.BeanDefinition#getPropertyValues()
  * @see org.springframework.beans.factory.support.AbstractBeanDefinition#getInitMethodName()
  *
+ * 实现 InitializingBean 接口的 Bean, 该 Bean 实例化后 Bean 中所有的
+ * 属性被 BeanFactory 进行注入之后的, 检查所有强制性属性的设置。
+ *
  * InitializingBean 接口在每个 Bean 初始化完成之后进行回调
  *
  * InitializingBean 接口可以作用于 singleton Bean 和 prototype Bean 实例
  *
- * InitializingBean 接口不能作用于懒加载的 Bean
  */
 public interface InitializingBean {
 
