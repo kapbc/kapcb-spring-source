@@ -937,11 +937,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		// Iterate over a copy to allow for init methods which in turn register new bean definitions.
 		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
-		// 将所有 BeanDefinition 的名字创建一个集合
+		// 创建 beanDefinitionNames 的副本 beanNames 用于后续的遍历, 以允许使用 init 等方法注册新的 BeanDefinition
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
 		// Trigger initialization of all non-lazy singleton beans...
-		// 触发所有非延迟加载单例 Bean 的初始化, 遍历 BeanDefinition 集合对象
+		// 触发所有非延迟加载单例 Bean 的初始化, 遍历 BeanName 集合对象
 		for (String beanName : beanNames) {
 
 			// Bean 定义信息的公共抽象类是 AbstractBeanDefinition, 普通的 Bean 在 Spring 解析 Bean 定义信息时实例化出来的是 GenericBeanDefinition
