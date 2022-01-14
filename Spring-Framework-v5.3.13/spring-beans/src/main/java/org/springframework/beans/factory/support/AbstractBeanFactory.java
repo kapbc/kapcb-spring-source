@@ -297,7 +297,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			// 并且父级工厂 parentBeanFactory 不为空, 那么就尝试从父级工厂中获取
 			if (parentBeanFactory != null && !containsBeanDefinition(beanName)) {
 				// Not found -> check parent.
-				// 获取 name 对应的规范名称[全类名], 如果 name 前有 &, 则返回 '&'+规范名称[全类名]
+				// 获取 name 对应的规范名称[全类名], 如果 name 前有 &, 则返回 '&' + 规范名称[全类名]
 				// 递归到 BeanFactory 中检查
 				String nameToLookup = originalBeanName(name);
 
