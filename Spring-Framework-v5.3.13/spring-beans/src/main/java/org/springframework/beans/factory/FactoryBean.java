@@ -105,7 +105,7 @@ public interface FactoryBean<T> {
 	 * @throws Exception in case of creation errors
 	 * @see FactoryBeanNotInitializedException
 	 *
-	 * 返回由于 FactoryBean 创建的 Bean 实例, 如果 isSingleton() 返回 true, 则
+	 * 返回由 FactoryBean 创建的 Bean 实例, 如果 isSingleton() 返回 true, 则
 	 * 该 Bean 实例会放入 Spring 的一级缓存中
 	 *
 	 * @see FactoryBean#isSingleton()
