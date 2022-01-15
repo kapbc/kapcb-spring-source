@@ -1117,6 +1117,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// Initialize lifecycle processor for this context.
 		// 为上下文初始化生命周期处理器
+		// ApplicationContext 在启动或停止时, 它会通过 LifecycleProcessor 来与
+		// 所有声明的 Bean 的周期做状态更新, 这一步就是初始化 LifecycleProcessor
 		initLifecycleProcessor();
 
 		// Propagate refresh to lifecycle processor first.
