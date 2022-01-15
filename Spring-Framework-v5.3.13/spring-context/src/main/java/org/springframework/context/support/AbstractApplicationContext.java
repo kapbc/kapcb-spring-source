@@ -989,6 +989,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see org.springframework.context.support.DefaultLifecycleProcessor
 	 *
 	 * 初始化 LifecycleProcessor
+	 *
+	 * 从容器中获取 BeanName 为 lifecycleProcessor 的 Bean 实例, 如果没有
+	 * 则使用 Spring 默认的 DefaultLifecycleProcessor
 	 */
 	protected void initLifecycleProcessor() {
 		// 获取 BeanFactory
