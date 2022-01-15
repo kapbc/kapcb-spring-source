@@ -2145,9 +2145,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			if (logger.isTraceEnabled()) {
 				logger.trace("Invoking afterPropertiesSet() on bean with name '" + beanName + "'");
 			}
+			// 如果 Bean 是 InitializingBean 实例类型则直接调用 InitializingBean 的 afterPropertiesSet 方法
 			if (System.getSecurityManager() != null) {
 				try {
 					AccessController.doPrivileged((PrivilegedExceptionAction<Object>) () -> {
+						// 激活 afterPropertiesSet 方法
 						((InitializingBean) bean).afterPropertiesSet();
 						return null;
 					}, getAccessControlContext());
@@ -2157,15 +2159,20 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				}
 			}
 			else {
+				// 激活 afterPropertiesSet 方法
 				((InitializingBean) bean).afterPropertiesSet();
 			}
 		}
 
+		// MergedBeanDefinition 不为空 && Bean 是不 NullBean
 		if (mbd != null && bean.getClass() != NullBean.class) {
+			// 获取自定义的 init-method 方法名称
 			String initMethodName = mbd.getInitMethodName();
+			// 判断是否指定了 init-method 方法, 如果指定了 init-method 方法, 则再调用制定的 init-method
 			if (StringUtils.hasLength(initMethodName) &&
 					!(isInitializingBean && "afterPropertiesSet".equals(initMethodName)) &&
 					!mbd.isExternallyManagedInitMethod(initMethodName)) {
+				// 通过反射调用 init-method
 				invokeCustomInitMethod(beanName, bean, mbd);
 			}
 		}
