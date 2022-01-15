@@ -491,6 +491,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		for (BeanPostProcessor processor : getBeanPostProcessors()) {
 			// 如果 Bean 被子类标记为代理, 则使用配置的拦截器创建一个代理
 			Object current = processor.postProcessAfterInitialization(result, beanName);
+			// 如果某一个 BeanPostProcessor 返回 null, 则中断后续所有 BeanPostProcessor 的激活, 直接放回当前结果
 			if (current == null) {
 				return result;
 			}
