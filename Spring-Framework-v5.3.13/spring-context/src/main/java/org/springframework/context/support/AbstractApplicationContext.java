@@ -987,10 +987,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * Initialize the LifecycleProcessor.
 	 * Uses DefaultLifecycleProcessor if none defined in the context.
 	 * @see org.springframework.context.support.DefaultLifecycleProcessor
+	 *
+	 * 初始化 LifecycleProcessor
 	 */
 	protected void initLifecycleProcessor() {
+		// 获取 BeanFactory
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
+		// 如果工厂中包存在 BeanName 为 lifecycleProcessor 的 Bean
 		if (beanFactory.containsLocalBean(LIFECYCLE_PROCESSOR_BEAN_NAME)) {
+			// 获取该 Bean
 			this.lifecycleProcessor =
 					beanFactory.getBean(LIFECYCLE_PROCESSOR_BEAN_NAME, LifecycleProcessor.class);
 			if (logger.isTraceEnabled()) {
@@ -998,9 +1003,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			}
 		}
 		else {
+			// 工厂中不存在 BeanName 为 lifecycleProcessor 的 Bean
+			// 使用 Spring 默认的 DefaultLifecycleProcessor
 			DefaultLifecycleProcessor defaultProcessor = new DefaultLifecycleProcessor();
+			// 设置 BeanFactory
 			defaultProcessor.setBeanFactory(beanFactory);
+			// 赋值给当前容器中的 lifecycleProcessor
 			this.lifecycleProcessor = defaultProcessor;
+			// 以 BeanNam 为 lifecycleProcessor 注册到容器中
 			beanFactory.registerSingleton(LIFECYCLE_PROCESSOR_BEAN_NAME, this.lifecycleProcessor);
 			if (logger.isTraceEnabled()) {
 				logger.trace("No '" + LIFECYCLE_PROCESSOR_BEAN_NAME + "' bean, using " +
@@ -1102,15 +1112,19 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	@SuppressWarnings("deprecation")
 	protected void finishRefresh() {
 		// Clear context-level resource caches (such as ASM metadata from scanning).
+		// 清理容器级别的资源缓存
 		clearResourceCaches();
 
 		// Initialize lifecycle processor for this context.
+		// 为上下文初始化生命周期处理器
 		initLifecycleProcessor();
 
 		// Propagate refresh to lifecycle processor first.
+		// 刷新所有实现了 Lifecycle 接口的 Bean
 		getLifecycleProcessor().onRefresh();
 
 		// Publish the final event.
+		// 发布 ContextRefreshEvent 事件告知容器已完成刷新
 		publishEvent(new ContextRefreshedEvent(this));
 
 		// Participate in LiveBeansView MBean, if active.
