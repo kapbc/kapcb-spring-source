@@ -57,7 +57,6 @@ import org.springframework.lang.Nullable;
  */
 
 
-
 public interface ApplicationContext extends EnvironmentCapable, ListableBeanFactory, HierarchicalBeanFactory,
 		MessageSource, ApplicationEventPublisher, ResourcePatternResolver {
 
