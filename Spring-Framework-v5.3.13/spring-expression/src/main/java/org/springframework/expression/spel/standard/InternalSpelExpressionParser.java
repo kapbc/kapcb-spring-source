@@ -123,7 +123,6 @@ class InternalSpelExpressionParser extends TemplateAwareExpressionParser {
 	 * @throws ParseException parse fail exception
 	 * 根据 EL 表达式字符串构建抽象语法树
 	 */
-
 	@Override
 	protected SpelExpression doParseExpression(String expressionString, @Nullable ParserContext context)
 			throws ParseException {
