@@ -129,6 +129,7 @@ class InternalSpelExpressionParser extends TemplateAwareExpressionParser {
 			throws ParseException {
 
 		try {
+			// 根据字符串表达式识别出 token 流, 简单来说就是一个分词的过程
 			this.expressionString = expressionString;
 			Tokenizer tokenizer = new Tokenizer(expressionString);
 			this.tokenStream = tokenizer.process();
