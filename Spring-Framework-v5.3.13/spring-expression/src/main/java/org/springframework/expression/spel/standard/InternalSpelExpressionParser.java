@@ -136,6 +136,11 @@ class InternalSpelExpressionParser extends TemplateAwareExpressionParser {
 			this.tokenStreamLength = this.tokenStream.size();
 			this.tokenStreamPointer = 0;
 			this.constructedNodes.clear();
+			// 根据构建的 token 流构建抽象语法树
+			// 这里按照 EL 表达式支持的运算符优先级进行解析, 构建了一个树形解构, 每个节点都表示一个
+			// 运算单元(操作符和若干操作数), 比如 OpPlus(加法运算)、OpMinus(减法运算)
+			// 最总构造出来的抽象语法树的根节点表示整个表达式的最低的运算单元, 比如 : 1 + (2 + 3), 即
+			// 根节点是 : OpPlus(加法运算) 两个操作数为 1 和 (2 + 3)
 			SpelNodeImpl ast = eatExpression();
 			Assert.state(ast != null, "No node");
 			Token t = peekToken();
