@@ -177,6 +177,7 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 					ConversionService cs = evalContext.getBeanFactory().getConversionService();
 					return (cs != null ? cs : DefaultConversionService.getSharedInstance());
 				}));
+				// 模板方法, 提供给子类进行扩展覆盖
 				customizeEvaluationContext(sec);
 				// 放入缓存
 				this.evaluationCache.put(evalContext, sec);
