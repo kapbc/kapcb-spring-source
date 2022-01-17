@@ -116,6 +116,13 @@ class InternalSpelExpressionParser extends TemplateAwareExpressionParser {
 		this.configuration = configuration;
 	}
 
+	/**
+	 * @param expressionString the raw expression string to parse
+	 * @param context a context for influencing this expression parsing routine (optional)
+	 * @return spel expression
+	 * @throws ParseException parse fail exception
+	 * 根据 EL 表达式字符串构建抽象语法树
+	 */
 
 	@Override
 	protected SpelExpression doParseExpression(String expressionString, @Nullable ParserContext context)
