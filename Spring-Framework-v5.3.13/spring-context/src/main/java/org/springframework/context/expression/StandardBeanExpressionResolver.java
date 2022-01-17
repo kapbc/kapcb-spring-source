@@ -178,6 +178,7 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 					return (cs != null ? cs : DefaultConversionService.getSharedInstance());
 				}));
 				customizeEvaluationContext(sec);
+				// 放入缓存
 				this.evaluationCache.put(evalContext, sec);
 			}
 			return expr.getValue(sec);
