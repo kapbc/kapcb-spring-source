@@ -135,7 +135,16 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 		this.expressionParser = expressionParser;
 	}
 
-
+	/**
+	 * Evaluate the given values as an expression, if applicable;
+	 * return the value as-is otherwise
+	 * @param value the value to check
+	 * @param evalContext the evaluation context
+	 * @return the resolved value (potentially the given value as-is)
+	 * @throws BeansException if evaluate fail
+	 *
+	 * 实现 BeanExpressionResolver 接口, 使用标准评估上下文对象解析 EL 表达式
+	 */
 	@Override
 	@Nullable
 	public Object evaluate(@Nullable String value, BeanExpressionContext evalContext) throws BeansException {
