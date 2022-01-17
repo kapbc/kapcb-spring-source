@@ -379,8 +379,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 
 				// Create bean instance.
-				// 创建 Bean 的实例对象, 针对不同 Scope 进行 Bean 的创建, 实例化依赖的 Bean 便可以实例化 mdb 本身
-				// 单例模式的创建
+				// 创建 Bean 的实例对象, 针对不同 Scope 进行 Bean 的创建, 将 Bean 所依赖的 Bean 全部实例化完成之后即可实例化 mdb 本身
+				// 单实例 Bean 实例化
 				if (mbd.isSingleton()) {
 
 					// 返回以 beanName 的(原始)单例对象, 如果未注册, 则使用 SingletonFactory 创建并注册一个对象
