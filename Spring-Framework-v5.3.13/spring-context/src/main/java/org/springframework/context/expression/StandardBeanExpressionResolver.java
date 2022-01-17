@@ -152,13 +152,20 @@ public class StandardBeanExpressionResolver implements BeanExpressionResolver {
 			return value;
 		}
 		try {
+			// 从本地缓存中获取抽象语法树
 			Expression expr = this.expressionCache.get(value);
 			if (expr == null) {
+				// 如果缓存中不存在, 则构建一个抽象语法树
 				expr = this.expressionParser.parseExpression(value, this.beanExpressionParserContext);
+				// 放入本地缓存中
 				this.expressionCache.put(value, expr);
 			}
+			// 从缓存中获取标准评估上下文对象
 			StandardEvaluationContext sec = this.evaluationCache.get(evalContext);
+			// 缓存中不存在
 			if (sec == null) {
+				// 构造标准评估上下文对象 StandardEvaluationContext
+				// 利用标准评估上下文对象 StandardEvaluationContext 解析 EL 表达式语法树, 得出计算结果
 				sec = new StandardEvaluationContext(evalContext);
 				sec.addPropertyAccessor(new BeanExpressionContextAccessor());
 				sec.addPropertyAccessor(new BeanFactoryAccessor());
