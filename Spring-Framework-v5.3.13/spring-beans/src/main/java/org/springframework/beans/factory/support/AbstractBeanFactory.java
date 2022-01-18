@@ -417,8 +417,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					}
 					beanInstance = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);
 				}
-				// 指定 Scope 上实例化 Bean
 				else {
+					// 指定 Scope 上实例化 Bean
 					String scopeName = mbd.getScope();
 					if (!StringUtils.hasLength(scopeName)) {
 						throw new IllegalStateException("No scope name defined for bean '" + beanName + "'");
@@ -461,7 +461,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	@SuppressWarnings("unchecked")
 	<T> T adaptBeanInstance(String name, Object bean, @Nullable Class<?> requiredType) {
 		// Check if required type matches the type of the actual bean instance.
-		// 检查实例化的 Bean 实例的类型是否符合需要的 Bean 实例类型, 不过不是则进行类型转换
+		// 检查实例化的 Bean 实例的类型是否符合需要的 Bean 实例类型, 如果不是则进行类型转换
 		if (requiredType != null && !requiredType.isInstance(bean)) {
 			try {
 				// 获取类型转换后的 Bean 实例
