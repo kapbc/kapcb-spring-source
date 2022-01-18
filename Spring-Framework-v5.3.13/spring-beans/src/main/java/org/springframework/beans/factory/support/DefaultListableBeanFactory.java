@@ -379,6 +379,11 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	// Implementation of ListableBeanFactory interface
 	//---------------------------------------------------------------------
 
+	/**
+	 * 检查从 XML 配置文件中解析的 BeanDefinition 中是否包含 BeanName 所对应的 Bean 定义信息
+	 * @param beanName the name of the bean to look for
+	 * @return boolean
+	 */
 	@Override
 	public boolean containsBeanDefinition(String beanName) {
 		Assert.notNull(beanName, "Bean name must not be null");
