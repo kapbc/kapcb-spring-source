@@ -16,16 +16,6 @@
 
 package org.springframework.beans.factory.support;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanCreationNotAllowedException;
 import org.springframework.beans.factory.BeanCurrentlyInCreationException;
@@ -36,6 +26,16 @@ import org.springframework.core.SimpleAliasRegistry;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Generic registry for shared bean instances, implementing the
@@ -208,7 +208,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	@Override
 	@Nullable
 	public Object getSingleton(String beanName) {
-		// 从 Spring 三级缓存中根据 beanName 获取单实例 bean 对象, 允许创建早期对象引用
+		// 尝试从 Spring 三级缓存中获取单实例 Bean, 允许创建早期对象引用
 		return getSingleton(beanName, true);
 	}
 
@@ -225,7 +225,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	@Nullable
 	protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 		// Quick check for existing instance without full singleton lock
-		// 在一级缓存 singletonObjects 中获取
+		// 尝试在一级缓存 singletonObjects 中获取
 		Object singletonObject = this.singletonObjects.get(beanName);
 		// 如果没有从一级缓存中获取到, 并且获取的 bean 正在创建中
 		// 判断 bean 对象是否正在创建中就是判断当前 beanName 是否在 singletonsCurrentlyInCreation 这个 Set 集合中
