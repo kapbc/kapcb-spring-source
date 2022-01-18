@@ -418,6 +418,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					finally {
 						afterPrototypeCreation(beanName);
 					}
+					// 检查当前 Bean 是否是 FactoryBean<?> 类型的 Bean 实例
 					beanInstance = getObjectForBeanInstance(prototypeInstance, name, beanName, mbd);
 				}
 				else {
@@ -440,6 +441,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 								afterPrototypeCreation(beanName);
 							}
 						});
+						// 检查当前 Bean 是否是 FactoryBean<?> 类型的 Bean 实例
 						beanInstance = getObjectForBeanInstance(scopedInstance, name, beanName, mbd);
 					}
 					catch (IllegalStateException ex) {
@@ -1973,12 +1975,19 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @param beanName the canonical bean name
 	 * @param mbd the merged bean definition
 	 * @return the object to expose for the bean
+	 *
+	 * 无论是从缓存中获取到的 Bean 还是通过不用的 scope 策略加载的 Bean 都只是最原始的 Bean 状态
+	 * 并不是开发者最总想要的 Bean。
+	 *
+	 * getObjectForBeanInstance() 方法的作用是返回开发者最终想要获取的 Bean
 	 */
 	protected Object getObjectForBeanInstance(
 			Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
 
 		// Don't let calling code try to dereference the factory if the bean isn't a factory.
+		// 如果 BeanName 是 FactoryBean<?> 相关的 BeanName
 		if (BeanFactoryUtils.isFactoryDereference(name)) {
+			// BeanInstance 不是 NullBean
 			if (beanInstance instanceof NullBean) {
 				return beanInstance;
 			}
