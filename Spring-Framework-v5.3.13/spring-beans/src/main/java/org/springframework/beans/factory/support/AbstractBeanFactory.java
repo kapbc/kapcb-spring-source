@@ -1987,40 +1987,62 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		// Don't let calling code try to dereference the factory if the bean isn't a factory.
 		// 如果 BeanName 是 FactoryBean<?> 相关的 BeanName
 		if (BeanFactoryUtils.isFactoryDereference(name)) {
-			// BeanInstance 不是 NullBean
+			// BeanInstance 是 NullBean
 			if (beanInstance instanceof NullBean) {
+				// 直接返回 beanInstance
 				return beanInstance;
 			}
+			// 如果不是 FactoryBean<?> 类型的 Bean 实例
 			if (!(beanInstance instanceof FactoryBean)) {
+				// 抛出异常 : 当前 Bean 不是一个工厂
 				throw new BeanIsNotAFactoryException(beanName, beanInstance.getClass());
 			}
+			// 如果 BeanName 与 FactoryBean<?> 相关 && beanInstance 不是 NullBean
+			// && beanInstance 是 FactoryBean<?> 类型 && RootBeanDefinition 不为空
 			if (mbd != null) {
+				// 当前 Bean 实例为 FactoryBean<?> 类型的 Bean
 				mbd.isFactoryBean = true;
 			}
+			// 直接返回当前 Bean 实例, 这也是为什么针对于一个 FactoryBean<?> 类型的 Bean 实例而言
+			// 使用 '&' + beanName 就能获取到 FactoryBean<?> 本身
 			return beanInstance;
 		}
 
 		// Now we have the bean instance, which may be a normal bean or a FactoryBean.
 		// If it's a FactoryBean, we use it to create a bean instance, unless the
 		// caller actually wants a reference to the factory.
+		// 现在拥有了一个新的 BeanInstance, 这个实例可能是常规 Bean 也有可能是 FactoryBean<?>
+		// 如果是 FactoryBean<?> 则使用它创建实例, 但如果是开发者想要直接获取工厂实例而不是工厂的 getObject()
+		// 方法对应的实例, 那么传入的 BeanName 应该加入前缀 '&'
 		if (!(beanInstance instanceof FactoryBean)) {
+			// 如果不是 FactoryBean 直接返回当前 Bean 实例
 			return beanInstance;
 		}
 
+		// 如果是 FactoryBean
 		Object object = null;
 		if (mbd != null) {
 			mbd.isFactoryBean = true;
 		}
 		else {
+			// 从缓存中加载
 			object = getCachedObjectForFactoryBean(beanName);
 		}
+
+		// 激活 FactoryBean<?> 的 getObject() 方法
 		if (object == null) {
 			// Return bean instance from factory.
+			// 这里已经明确知道 beanInstance 一定是 FactoryBean<?> 类型
 			FactoryBean<?> factory = (FactoryBean<?>) beanInstance;
+
 			// Caches object obtained from FactoryBean if it is a singleton.
+			// 如果 mbd 为空 && 从 XML 配置文件中加载的 BeanDefinition 中包含 BeanName 对应的 Bean 定义信息
 			if (mbd == null && containsBeanDefinition(beanName)) {
+				// 将解析 XML 配置文件的 GenericBeanDefinition 转换为 RootBeanDefinition, 如果指定的 BeanName
+				// 是子 Bean 的话同时会合并父类的相关属性
 				mbd = getMergedLocalBeanDefinition(beanName);
 			}
+			// 是否是开发者自己定义的而不是应用程序本身定义的
 			boolean synthetic = (mbd != null && mbd.isSynthetic());
 			object = getObjectFromFactoryBean(factory, beanName, !synthetic);
 		}
