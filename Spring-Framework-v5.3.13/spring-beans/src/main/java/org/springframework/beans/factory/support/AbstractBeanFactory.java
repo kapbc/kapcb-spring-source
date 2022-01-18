@@ -256,6 +256,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		// 提取对应的 beanName, 这里提取之后不可直接使用, 还需要进行转换, 原因在于当 Bean 对象实现 FactoryBean 接口
 		// 之后就会变成 &beanName。并且如果同时存在别名, 也需要去除掉一些特殊的修饰符比如 '&'
+		// 同时这里传入的 beanName 参数还可能是别名, 也可能是 FactoryBean, 所以需要进行一系列的解析
 		String beanName = transformedBeanName(name);
 		Object beanInstance;
 
