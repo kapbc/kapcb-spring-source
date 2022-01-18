@@ -280,6 +280,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 			// 返回对象的实例。
 			// 当实现了 FactoryBean 接口的对象, 需要获取具体的对象时就需要调用此方法来获取实例对象
+			// 实际作用就是检测当前 Bean 是否是 FactoryBean<?> 类型的 Bean, 如果是则需要调用 FactoryBean<?>
+			// 接口中的 getObject() 作为返回值返回对象的实例
 			beanInstance = getObjectForBeanInstance(sharedInstance, name, beanName, null);
 		}
 
