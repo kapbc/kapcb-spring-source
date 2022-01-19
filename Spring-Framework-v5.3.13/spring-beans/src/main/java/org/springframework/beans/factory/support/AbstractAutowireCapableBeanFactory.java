@@ -1299,10 +1299,18 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @param beanName the name of the bean
 	 * @return the bean object to use instead of a default instance of the target bean, or {@code null}
 	 * @see InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation
+	 *
+	 * 激活 InstantiationAwareBeanPostProcessor 接口中的 postProcessBeforeInstantiation() 方法
+	 *
+	 * Bean 实例化前调用, 也就是将 AbstractBeanDefinition 转换为 BeanWrapper 前的处理。给子类一个修改 BeanDefinition
+	 * 的机会, 也就是当程序经过这个方法后, Bean 可能以及不是我们认为的 Bean, 而是或许成为了一个经过处理的代理 Bean, 可能是
+	 *  CGLIB 生成的代理。
 	 */
 	@Nullable
 	protected Object applyBeanPostProcessorsBeforeInstantiation(Class<?> beanClass, String beanName) {
+		// 获取所有的 InstantiationAwareBeanPostProcessor 实例
 		for (InstantiationAwareBeanPostProcessor bp : getBeanPostProcessorCache().instantiationAware) {
+			// 依次激活 InstantiationAwareBeanPostProcessor 接口中的 postProcessBeforeInstantiation 方法
 			Object result = bp.postProcessBeforeInstantiation(beanClass, beanName);
 			if (result != null) {
 				return result;
