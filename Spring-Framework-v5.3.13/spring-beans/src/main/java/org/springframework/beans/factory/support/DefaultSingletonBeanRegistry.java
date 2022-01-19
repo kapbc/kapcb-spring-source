@@ -350,7 +350,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					if (recordSuppressedExceptions) {
 						this.suppressedExceptions = null;
 					}
-					//
+					// 当 Bean 加载结束后需要移除缓存中对该 Bean 的正在加载状态的记录
 					afterSingletonCreation(beanName);
 				}
 				// 如果是生成新的单例 Bean
