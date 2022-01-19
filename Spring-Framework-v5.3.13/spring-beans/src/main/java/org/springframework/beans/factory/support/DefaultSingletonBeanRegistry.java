@@ -279,6 +279,11 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @return the registered singleton object  -- 注册的单例对象
 	 *
 	 * 返回以给定名称注册的(原始)单例对象, 如果尚未注册, 则创建并注册一个对象
+	 *
+	 * 首先检查 Spring 的一级缓存查看当前 BeanName 对应的 Bean 实例是否已注册
+	 * 若没有注册, 记录 BeanName 的正在加载状态
+	 * 加载单例 Bean 之前记录加载状态
+	 *
 	 */
 	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
 		// beanName 属性校验
@@ -305,6 +310,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				}
 
 				// 创建单例之前的回调, 默认实现将单例注册为当前正在创建中
+				// 便于循环依赖的检测
 				beforeSingletonCreation(beanName);
 
 				// 表示生成了新单例对象的标记, 默认为 false, 表示没有生成新的单例对象
@@ -344,6 +350,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					if (recordSuppressedExceptions) {
 						this.suppressedExceptions = null;
 					}
+					//
 					afterSingletonCreation(beanName);
 				}
 				// 如果是生成新的单例 Bean
@@ -441,6 +448,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * <p>The default implementation register the singleton as currently in creation.
 	 * @param beanName the name of the singleton about to be created
 	 * @see #isSingletonCurrentlyInCreation
+	 *
+	 * 记录当前 BeanName 对应的 Bean 实例正在创建
 	 */
 	protected void beforeSingletonCreation(String beanName) {
 		if (!this.inCreationCheckExclusions.contains(beanName) && !this.singletonsCurrentlyInCreation.add(beanName)) {
@@ -453,6 +462,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * <p>The default implementation marks the singleton as not in creation anymore.
 	 * @param beanName the name of the singleton that has been created
 	 * @see #isSingletonCurrentlyInCreation
+	 *
+	 * 此时 Bean 的加载已经结束, 移除缓存中对该 Bean 的正在加载状态的记录
 	 */
 	protected void afterSingletonCreation(String beanName) {
 		if (!this.inCreationCheckExclusions.contains(beanName) && !this.singletonsCurrentlyInCreation.remove(beanName)) {
