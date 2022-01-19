@@ -287,8 +287,9 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 		synchronized (this.singletonObjects) {
 			// 从一级缓存中获取 beanName 对应的单例对象
 			// 即首先从一级缓存中获取单例 Bean, 如果一级缓存中已经存在 Bean 实例则直接返回, 避免重复创建
+			// 这一步是非常有必要的, 否则可能会重复创建 Bean 实例
 			Object singletonObject = this.singletonObjects.get(beanName);
-			// 如果获取不到对象
+			// 如果获取不到对象, 则进行 singleton 的初始化
 			if (singletonObject == null) {
 				// 如果当前正在 destroySingleton 中
 				if (this.singletonsCurrentlyInDestruction) {
