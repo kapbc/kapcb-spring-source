@@ -283,9 +283,10 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
 		// beanName 属性校验
 		Assert.notNull(beanName, "Bean name must not be null");
-		// 使用单例对象的高速缓存 Map 作为锁, 保证线程安全
+		// 同步全局变量, 保证线程安全
 		synchronized (this.singletonObjects) {
 			// 从一级缓存中获取 beanName 对应的单例对象
+			// 即首先从一级缓存中获取单例 Bean, 如果一级缓存中已经存在 Bean 实例则直接返回, 避免重复创建
 			Object singletonObject = this.singletonObjects.get(beanName);
 			// 如果获取不到对象
 			if (singletonObject == null) {
