@@ -1278,6 +1278,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				if (targetType != null) {
 					// 激活 InstantiationAwareBeanPostProcessor 中的 postProcessBeforeInstantiation 方法
 					bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName);
+					// 如果返回的 Bean 不为空, 那么此时 Bean 已经进行实例化, 不会再次进行实例化过程, 所以只能
+					// 在这里应用后置增强器的 postProcessAfterInitialization 方法
 					if (bean != null) {
 						// 激活 BeanPostProcessor 中的 postProcessAfterInitialization 方法
 						bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
