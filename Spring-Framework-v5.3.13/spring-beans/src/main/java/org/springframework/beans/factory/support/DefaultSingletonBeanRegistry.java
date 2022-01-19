@@ -355,7 +355,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				}
 				// 如果是生成新的单例 Bean
 				if (newSingleton) {
-					// 加入一级缓存
+					// 加入一级缓存, 同时删除加载 Bean 过程中所记录的各种辅助状态
 					addSingleton(beanName, singletonObject);
 				}
 			}
