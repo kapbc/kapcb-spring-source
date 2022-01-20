@@ -42,6 +42,7 @@ import org.springframework.util.CollectionUtils;
 @Configuration(proxyBeanMethods = false)
 public abstract class AbstractAsyncConfiguration implements ImportAware {
 
+	
 	@Nullable
 	protected AnnotationAttributes enableAsync;
 
