@@ -39,6 +39,8 @@ import org.springframework.util.CollectionUtils;
  * @since 3.1
  * @see EnableAsync
  */
+
+
 @Configuration(proxyBeanMethods = false)
 public abstract class AbstractAsyncConfiguration implements ImportAware {
 
