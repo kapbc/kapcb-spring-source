@@ -309,8 +309,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
 
-				// 创建单例之前的回调, 默认实现将单例注册为当前正在创建中
-				// 便于循环依赖的检测
+				// 创建单例之前的回调, 默认实现将单例注册为当前正在创建中, 便于循环依赖的检测
 				beforeSingletonCreation(beanName);
 
 				// 表示生成了新单例对象的标记, 默认为 false, 表示没有生成新的单例对象
