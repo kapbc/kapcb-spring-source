@@ -51,7 +51,6 @@ public abstract class AbstractAsyncConfiguration implements ImportAware {
 	@Nullable
 	protected Supplier<AsyncUncaughtExceptionHandler> exceptionHandler;
 
-
 	@Override
 	public void setImportMetadata(AnnotationMetadata importMetadata) {
 		this.enableAsync = AnnotationAttributes.fromMap(
@@ -79,3 +78,4 @@ public abstract class AbstractAsyncConfiguration implements ImportAware {
 	}
 
 }
+
