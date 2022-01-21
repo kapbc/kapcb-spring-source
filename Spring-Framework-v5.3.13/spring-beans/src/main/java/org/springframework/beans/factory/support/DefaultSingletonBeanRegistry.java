@@ -251,7 +251,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 							ObjectFactory<?> singletonFactory = this.singletonFactories.get(beanName);
 							// 如果从三级缓存中获取到
 							if (singletonFactory != null) {
-								// 从对象工厂中获取 bean 实例对象(调通工厂方法获取 bean 实例对象, lambda 表达式回调获取)
+								// 从对象工厂中获取 bean 实例对象(调用工厂方法获取 bean 实例对象, lambda 表达式回调获取)
 								// 当某些方法需要提前初始化的时候则会调用 addSingletonFactory 方法将对应的 ObjectFactory 初始化策略存储在 singletonFactories 中
 								singletonObject = singletonFactory.getObject();
 								// 放入二级缓存中, 一级缓存用于存放完整实例化的 bean 实例, 此时获取的 bean 实例并非完整的 bean 实例
