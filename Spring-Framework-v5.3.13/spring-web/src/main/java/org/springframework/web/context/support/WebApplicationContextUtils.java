@@ -191,7 +191,7 @@ public abstract class WebApplicationContextUtils {
 			sc.setAttribute(ServletContextScope.class.getName(), appScope);
 		}
 
-		// 通过 ConfigurableListableBeanFactory 接口中的 registerResolvableDependency 方法注入 ObjectFactory<T> 接口扩展的对象工厂
+		// 手动注入各种经过 ObjectFactory 代理的类, 以保证线程安全
 		beanFactory.registerResolvableDependency(ServletRequest.class, new RequestObjectFactory());
 		beanFactory.registerResolvableDependency(ServletResponse.class, new ResponseObjectFactory());
 		beanFactory.registerResolvableDependency(HttpSession.class, new SessionObjectFactory());
