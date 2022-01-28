@@ -779,7 +779,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	}
 
 
-
 	/**
 	 *
 	 * @param beanName the name of the bean
