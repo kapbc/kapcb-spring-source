@@ -778,6 +778,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		return exposedObject;
 	}
 
+
+
+
+
 	/**
 	 *
 	 * @param beanName the name of the bean
