@@ -1167,7 +1167,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		CachedIntrospectionResults.clearClassLoader(getClassLoader());
 	}
 
-
 	/**
 	 * Register a shutdown hook {@linkplain Thread#getName() named}
 	 * {@code SpringContextShutdownHook} with the JVM runtime, closing this
