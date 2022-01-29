@@ -1164,7 +1164,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 
-
 	protected void resetCommonCaches() {
 		ReflectionUtils.clearCache();
 		AnnotationUtils.clearCache();
