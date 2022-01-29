@@ -1179,7 +1179,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	@Override
 	public void registerShutdownHook() {
-
 		if (this.shutdownHook == null) {
 			// No shutdown hook registered yet.
 			this.shutdownHook = new Thread(SHUTDOWN_HOOK_THREAD_NAME) {
