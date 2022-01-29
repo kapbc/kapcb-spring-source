@@ -1183,7 +1183,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 
-
 	@Override
 	public void registerShutdownHook() {
 		if (this.shutdownHook == null) {
