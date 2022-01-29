@@ -1169,7 +1169,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 
-
 		CachedIntrospectionResults.clearClassLoader(getClassLoader());
 	}
 
