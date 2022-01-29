@@ -1185,7 +1185,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				@Override
 				public void run() {
 
-
 					synchronized (startupShutdownMonitor) {
 						doClose();
 					}
