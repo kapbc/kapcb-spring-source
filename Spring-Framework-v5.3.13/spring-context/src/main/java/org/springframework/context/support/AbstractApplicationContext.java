@@ -1168,7 +1168,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 
-
 		AnnotationUtils.clearCache();
 		ResolvableType.clearCache();
 		CachedIntrospectionResults.clearClassLoader(getClassLoader());
