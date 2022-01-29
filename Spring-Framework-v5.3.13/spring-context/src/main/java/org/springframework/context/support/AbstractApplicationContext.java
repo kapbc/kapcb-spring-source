@@ -1187,7 +1187,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 
 
-
 					synchronized (startupShutdownMonitor) {
 						doClose();
 					}
