@@ -1192,7 +1192,6 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			Runtime.getRuntime().addShutdownHook(this.shutdownHook);
 		}
 
-
 	}
 
 	/**
